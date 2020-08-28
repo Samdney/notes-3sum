@@ -1,0 +1,37 @@
+% ================================================================================
+% --------------------------------------------------------------------------------
+\section{Preliminaries}
+\label{s:preliminaries}
+% --------------------------------------------------------------------------------
+We give some definitions and notation agreements. Since our algorithm will work on the binary representation level of numbers, we will repeat the basic properties of numbers, addition and bit manipulation in binary numeral system.
+
+
+\begin{definition}[Positive integers]
+    Each natural number $z^{+} \in \mathbb{Z}^{+}_{0}$ can be described by the bit string $B_{z^{+}} := \left(0,b_{[N-2]}, b_{[N-3]},\cdots, b_{[1]}, b_{[0]}\right)$ with size $N := \lceil \log_{2}\left(z^{+}\right) \rceil$  given by the binary representation of a decimal number $z^{+} := \sum_{q = 0}^{N - 1} b_{[q]} 2^{q}$ with $b_{[q]} \in \{0, 1\}$.
+\label{def:positiveintegers}
+\end{definition}
+
+
+\begin{definition}[Bit toggle(b)]
+    The toggle function $\mathrm{toggle}\left(B\right)$ inverts the bits $b_{[q]}$ of the bit string $B$ bitwise by $0 \mapsto 1$ and $1 \mapsto 0$.
+\label{def:toggle}
+\end{definition}
+
+
+\begin{definition}[Two's complement $B^{-1}$]
+    The two's complement $B^{-1}$ of a bit string $B$ with highest bit index $N - 1$ is defined as its complement of $B$ so that $B + B^{-1} = 2^{N} - 1$. The two's complement $B^{-1}$ of $B$ can be determined by $B^{-1} = \mathrm{toggle}\left(B\right) + 1$ and the two's complement $B$ of $B^{-1}$ by $B = \mathrm{toggle}\left(B^{-1}\right) + 1$. 
+\label{def:twoscomplement}
+\end{definition}
+
+
+\begin{definition}[Negative integers]
+    Each negative integer number $z^{-} \in \mathbb{Z}^{-}$ can be described by the bit string $B_{z^{-}} := \left(1, b_{[N-2]}, b_{[N-3]}, \cdots, b_{[1]} b_{[0]}\right)$ with size $N := \lceil \log_{2}\left(|z^{-}|\right) \rceil$ given by the binary representation of the belonging positive decimal number by $z^{-} := \left(-1\right)z^{+}$. Negative integers are represented by the two's complement in binary representation.
+\label{def:negativeintegers}
+\end{definition}
+
+
+\begin{definition}[Integer binary addition]
+    The addition of integers $z_{i}$ in their binary representation is given by a bitwise addition in base two of their bit strings $B_{z_{i}}$ with carriers $c_{[q]} \in \{0,1\}$, $q = 0, \dots N - 1$.
+\label{def:integerbinaryaddition}
+\end{definition}
+% ================================================================================
