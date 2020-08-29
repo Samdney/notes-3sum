@@ -1,0 +1,68 @@
+% ================================================================================
+% --------------------------------------------------------------------------------
+\section{Introduction}
+\label{s:introduction}
+% --------------------------------------------------------------------------------
+We consider the \texttt{3SUM} problem and its limited to only integers version \texttt{Int3SUM}, a variant of this, one of the most basic problems in algorithm design, which are defined as follows:
+
+\begin{definition}[\texttt{3SUM}]
+    Given a set $S \subset \mathbb{R}$, $|S| := n$, determine if there exists $n_{1}, n_{2}, n_{3} \in S$ such that $n_{1} + n_{2} + n_{3} = 0$.
+\label{def:3sum}
+\end{definition}
+
+\begin{definition}[\texttt{Int3SUM}]
+    Given a set $S \subseteq \{-U, \dots, U\} \subset \mathbb{Z}$, $|S| := n$, determine if there exists $z_{1}, z_{2}, z_{3} \in S$ such that $z_{1} + z_{2} + z_{3} = 0$.
+\label{def:int3sum}
+\end{definition}
+
+Since numerous problems can be reduced from \texttt{3SUM} \cite{gajentaan1995class} \cite{barequet2001polygon}, it has raised wide interest. Such problems which are at least as hard as \texttt{3SUM} are called \textit{3SUM-Hardness}. Some of them are ...
+
+\begin{itemize}
+    \item Given a $n$-point set in the plane, determine if it contains three collinear points. It was shown by Gajentaan and Overmars \cite{gajentaan1995class} that it can be solved in $\mathcal{O}\left(n^{2}\right)$ time.
+    \item Given a set of $n$ triangles in the plane, determine if their union contains a hole or not, respectively compute the area of their union which can be also solved in $\mathcal{O}\left(n^{2}\right)$ time \cite{gajentaan1995class}.
+    \item Given two $n$-poin sets $X, Y \subset \mathbb{R}$, each of size $n$, determine if all elements in $X + Y = \{x + y \, | \, x \in X, y \in Y\}$ are distinct. It can be solved in $\mathcal{O}\left(n^{2}\log\left(n\right)\right)$ time \cite{barequet2001polygon}. This problem, including its stronger version with sorting $X + Y$, is used for the conditional lower bounds of problems by Barequet and Har-Peled in \cite{barequet2001polygon} and are classified as \textit{Sorting $X + Y$-Hard}. It's an open question if it can be solve in $o\left(n^{2}\log\left(n\right)\right)$ \cite{TheOpenP60:online} \cite{TheOpenP60:onlineP11} \cite{TheOpenP60:onlineP41}.    
+    \item Given two $n$-edge convex polygons, determine if one can be placed inside the other by translation and rotation which can also be solved in $\mathcal{O}\left(n^{2}\log\left(n\right)\right)$ time \cite{barequet2001polygon}.
+    \item ... .
+\label{it:3sumhardnessproblems}
+\end{itemize}
+
+So, it turns out that examinations of \texttt{3SUM} are a starting point for wide studies of problem statements in computational geometry.
+% --------------------------------------------------------------------------------
+\subsection{Related Work}
+\label{ss:relatedwork}
+% --------------------------------------------------------------------------------
+The lower bound of computational complexity of \texttt{3SUM} is a long standing unsolved question. Over the years, work has been done and several results were achieved.
+
+
+\begin{itemize}
+    \item A trivial hash table algorithm can solve \texttt{3SUM} in $\mathcal{O}\left(n^{2}\right)$ time.\\
+        All elements $s \in S$ are hashed into a table $T_{h}$ by $h\left(s\right)$. Then we go for all $\left(h\left(s_{i}\right) + h\left(s_{j}\right)\right)$ through the hash table and check for $-\left(h\left(s_{i}\right) + h\left(s_{j}\right)\right)$.
+    \item Erickson \cite{erickson1995lower} credited Seidel \cite{edelsbrunner1986constructing} that \texttt{Int3SUM} can be solved with fast Fourier transform in $\mathcal{O}\left(n + U\log\left(U\right)\right)$ time, for a universe size $U$ (an integer range $[-U, \dots, U]$) \cite{harper1975sorting}.
+    \item Baran, Demaine and Pǎtra{\c{s}}cu \cite{baran2005subquadratic} showed that \texttt{Int3SUM} can be solve in $\mathcal{O}\left(n^{2}/\left(\log\left(n\right)/\log \log\left(n\right)\right)^{2}\right)$ time with high probability on the word RAM with $U = 2^{\omega}$ and $\omega > \log\left(n\right)$ is the machine word size. It uses a mixture of randomized universe reduction by hashing, word packing and table lookups.
+    \item Erickson \cite{erickson1995lower} and Ailon and Chazelle \cite{ailon2005lower} proved that any $3$-linear decision tree for \texttt{3SUM} has depth $\Omega\left(n^{2}\right)$ and matching $\Omega\left(n^{\lceil k/2 \rceil}\right)$ lower bounds in some particular models.
+    \item Grønlund and Pettie \cite{grnlund2014threesomes} showed that \texttt{3SUM} can be solved in subquadratic time by a deterministic algorithm which runs in $\mathcal{O}\left(n^{2}\left(\log\left(n\right) / \log \log\left(n\right)\right)^{2/3}\right)$ time and a randomized algorithm which runs in $\mathcal{O}\left(n^{2}\left(\log \log\left(n\right)\right)^{2} / \log \left(n\right)\right)$ expected time with high probability. They also showed that it exists a $4$-linear decision tree with deph $\mathcal{O}\left(n^{3/2} \sqrt{\log\left(n\right)}\right)$.
+    \item Freund \cite{freund2017improved} developed a \texttt{3SUM} algorithm by eliminating one of Grønlund and Pettie's conceptual building blocks and lead to a bound for running time of $\mathcal{O}\left(n^{2} \log \log\left(n\right)/\log\left(n\right)\right)$.
+    \item Gold and Sharir \cite{gold_et_al:LIPIcs:2017:7836} showed that the randomized $4$-linear decision tree complexity of \texttt{3SUM} is $\mathcal{O}\left(n^{3/2}\right)$.
+    \item Chan \cite{chan2019more} gave an algorithm that solved \texttt{3SUM} in $\mathcal{O}\left(\left(n^{2}/\log\left(n\right)\right)\left(\log \log\left(n\right)\right)^{\mathcal{O}\left(1\right)}\right)$ time and obtained subquadratic results on some \texttt{3SUM}-hard problems.
+    \item Kane, Lovett, and Moran \cite{kane2017nearoptimal} constructed a linear decision tree that solves the \texttt{3SUM} problem with $\mathcal{O}\left(n \log^{2}\left(n\right)\right)$ queries which compare the sums of two $3$-subsets.
+    \item Kopelowitz, Pettie and Porat \cite{kopelowitz2014higher} conjectured that \texttt{3SUM} is unsolvable in $\mathcal{O}\left(n^{2 - \omega\left(1\right)}\right)$ expected time.
+\label{it:realtedwork}
+\end{itemize}
+
+In this work, we want to present a new kind of algorithm design, different compared to the mentioned works. We can see, that apart from Seidel's  \cite{edelsbrunner1986constructing} Fast Fourier transformation and Baran, Demaine and Pǎtra{\c{s}}cu's \cite{baran2005subquadratic} work which used randomized universe reducation, word packing and table lookups, for \texttt{Int3SUM}, these works are all mainly based on decision trees and queries depending on the numbers of $S$ in decimal representation. We not want to do this kind of approach again. Instead, we will use a new angle of view based on the binary representation of the numbers of $S$ and the characteristics of binary addition.
+% --------------------------------------------------------------------------------
+\subsection{Our Contributions}
+\label{ss:ourcontributions}
+% --------------------------------------------------------------------------------
+TODO
+% --------------------------------------------------------------------------------
+\subsection{Our Results}
+\label{ss:ourresults}
+% --------------------------------------------------------------------------------
+TODO
+% --------------------------------------------------------------------------------
+\subsection{An Overview}
+\label{ss:anoverview}
+% --------------------------------------------------------------------------------
+TODO
+% ================================================================================
