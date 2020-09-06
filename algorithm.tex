@@ -1,0 +1,253 @@
+% ================================================================================
+% --------------------------------------------------------------------------------
+\section{The General Algorithm}
+\label{s:thegeneralalgorithm}
+% --------------------------------------------------------------------------------
+We present the final algorithm. At first, we will give a general overview about the algorithm idea. Then we will describe necessary preprocessing data structuring and our \texttt{3SUM} frame algorithm itself.
+% --------------------------------------------------------------------------------
+\subsection{The Idea}
+\label{ss:theidea}
+% --------------------------------------------------------------------------------
+For the determination of valid solutions we split our algorithm into several parts. At first we look at the set of the given numbers $n_{i}$. We use a list entries binary tree $T$ to sort them according their bit value $0$ or $1$ at bit position $q$. Next, we generate a second binary tree $T^{string}$ which is build by the set of rules $\mathcal{C}$ of definitions \ref{def:zerosumbitadditionproperties} and \ref{def:zerosumbitadditionproperties_fixedpointinteger} and their successor rules we determined in the last section. Finally, we go through the tree $T^{string}$ from its root to the final maximal depth $b + 1$. In each depth \texttt{bit}, we take the given rules $\mathcal{C}$s and the solutions from the direct previous depth \texttt{bit - 1} and check if the nodes of tree $T$ which are necessary to statisfy this specific rule with previous solution combination, have at least as much elements as necessary. If they all have enough element, then add the new solution to the set of solutions of depth \texttt{bit} to the tree $T^{string}$. In the next sections, we will explain this more detailed.
+% --------------------------------------------------------------------------------
+\subsection{Data Structuring}
+\label{ss:datastructuring}
+% --------------------------------------------------------------------------------
+The determination of \texttt{3SUM} solutions starts with some preparation.
+
+\begin{step}[Assumptions]
+    Given a list $L$ of $n$ real numbers $n_{i} \in \mathbb{R}$. Each number $n_{i}$ can again consists of several real numbers $n_{i,j}$ (we will call them \textbf{sub numbers}). Without further checking, we assume that all $n_{i}$ and their sub numbers $n_{i,j}$ are valid values, means no one of them is \textit{NaN} or $\pm \infty$.
+
+Furthermore, we assume that the number of bits $b^{pre}$ for the representation of pre radix point parts of rational numbers $q \in \mathbb{Q}$ is choosen in such a way, that its precision is sufficient enough to present all pre radix point parts of rational numbers of our list $L$ exactly. Analog, we assume that the number of bits $b^{post}$ for the representation of post radix point parts of rational numbers is choosen in such a way, that its precision is sufficient enough to present all post radix point parts of rational numbers of our list exactly, too.
+\label{step:assumptions}
+\end{step}
+
+The first step at all, consists of generating and saving the list $L$ of $n$ real numbers. We introduce our new data type \texttt{fixedint} (see listing \ref{lst:datatype_fixedint}) for fixed-point integer arithmetic.
+
+\begin{lstlisting}[caption=Data type \texttt{fixedint}, label=lst:datatype_fixedint]
+    
+    datatype fixedint x.y {
+        (int) x;
+        (int) y;
+    };
+
+\end{lstlisting}
+
+
+Next, we define a new data structure \texttt{listnumber} (see listing \ref{lst:datastruct_listnumber}) for one list element $n_{i}$. We assume that a number $n$ can consists of one rational $r$ and several irrational $i$ parts. Since, we know from our consideration of section \textit{Real numbers} \ref{ss:realnumbers} that it is not necessary to save the irrational numbers itself, we only safe a symbolic string for each irrational number $i$ (see \texttt{datatype irrational}) and finally all the necessary irrational symbolic strings for our $n$ in one list (see \texttt{irrational list}). Next, in \texttt{listnumber}, we save a possible rational sub number and the rational factors of possible irrational sub numbers with \texttt{fixedint} data type. Finally, we save a mapping \texttt{map}, to be still able to identify the saved rational factors of irrational sub numbers with their belonging irrational number string, later.
+
+
+\begin{lstlisting}[caption={Data type \texttt{irrational}, data structure \texttt{listnumber} and mapping \texttt{map} from a list of irrational numbers to n}, label=lst:datastruct_listnumber]
+
+    datatype irrational i {
+        (string) i;
+    };
+
+    irrational list n_i = ( irrational i1,
+                            irrational i2,
+                            irrational i3,
+                        ...);    
+
+    struct listnumber n (   fixedint qx.qy,
+                            fixedint i1_qx.i1_qy,
+                            fixedint i2_qx.i2.qy,
+                            fixedint i3_qx.i3_qy,
+                        ...);
+
+    map n_types: n_i -> n[1:];
+
+\end{lstlisting}
+
+
+We save all numbers $n_{i}$ in a list $L$, each as structure \texttt{listnumber}. To keep things better to manage, we define \texttt{irrational list} as complete list for all possible irrational sub numbers $i$ overall $n_{i}$. Means, if for example the number $n_{1}$ consists of the irrational sub number $i_{1}$ and number $n_{2}$ consists of the irrational sub number $i_{2} \neq i_{1}$, we save $i_{1}$ and $i_{2}$ in common in one \texttt{irrational list}, and define $i2\_qx.i2\_qy := 0.0$ for element $n_{1}$ and $i1\_qx.i1\_qy := 0.0$ for element $n_{2}$. In this way, we get an uniform list of the rational parts of irrational sub numbers overall numbers $n_{i}$ with one fixed \texttt{map}, which is much easier to manage.
+
+
+\begin{step}[Saving list elements]
+    We build a \texttt{listnumber list} $L$ of real numbers $n_{i} \in \mathbb{R}$ by saving each element $n_{i}$ as \texttt{listnumber} in an array at index $i$. The belonging irrational sub numbers are saved in one common \texttt{irrational list n\_i} overall all elements $n_{i}$ and a belonging mapping \texttt{map n\_types}.
+\label{step:savinglistelements}
+\end{step}
+% --------------------------------------------------------------------------------
+\subsection{The \texttt{3SUM} Frame Algorithm}
+\label{ss:the3sumframealgorithm}
+% --------------------------------------------------------------------------------
+We start with the \texttt{3SUM} frame algorithm. At first, we want to consider the case of having only one rational sub number part for each $n_{i}$ which means $n_{i} := q_{i}$ and no further sub numbers, at all. We use $b^{pre}$ pre radix point bits and $b^{post}$ post radix point bits. The frame algorithm consists of two binary trees which interacts with each other. We start with a new data structure \texttt{node\_T} (see listing \ref{lst:datastruct_node}) for the binary tree $T$ which administrates the list entries $n_{i}$ of the given list $L$.
+
+
+\begin{lstlisting}[caption={Data structure \texttt{node\_T} for saving the information of one node of our binary tree $T$}, label=lst:datastruct_node]
+
+    struct node_T (_n = empty,_count = 0){
+        struct listnumber list n = _n;
+        int count = _count;
+        struct node_T *zero_left = nil;
+        struct node_T *one_right = nil;
+    };
+
+\end{lstlisting}
+
+It consists of a list of numbers $n_{i}$ by \texttt{struct listnumber list n} and a counting value \texttt{int count} for telling us the length of our list which is saved in this node. The default case is an empty list of length $0$. Additionally, we initialize two null pointers \texttt{struct node\_T *zero\_left} and \texttt{struct node\_T *one\_right} which will be used for pointing to the child nodes, later. Optional we could augment our \texttt{listnumber list} data structure by also saving the list index of each $n_{i}$ in the original list $L$. This information isn't necessary for our algorithm but can be interesting if we still want to be able to identify our solutions with the original list entries. 
+
+Our second binary tree $T^{string}$ will be used to administrate the zero sum addition rules $C$ as well their valid solutions in depth $d$ of the binary tree. For this we will use for each node a new data structure \texttt{node\_Tstring} (see listing \ref{lst:datastruct_nodeC}). 
+
+
+\begin{lstlisting}[caption={Data structure \texttt{node\_Tstring} for saving the information of one node of our binary tree $T^{string}$}, label=lst:datastruct_nodeC]
+
+    struct rule C (C0, C1, c, b);
+    struct pt[3] vn (None, None, None); 
+
+    struct node_Tstring (_C = empty, _vn = empty) {
+        struct rule C = _C;
+        int list vn = _vn;
+        struct node_Tstring *C_left = nil;
+        struct node_Tstring *C_right = nil;
+    };
+
+\end{lstlisting}
+
+In the sections \textit{Integer Binary Addition} \ref{ss:integerbinaryaddition} and \textit{Fixed-Point Integer Arithmetic Binary Addition} \ref{sss:fixedpointintegerarithmeticbinaryaddition}, we defined a set of rules regarding zero sum binary addition. For us, this means the addition of three numbers to get a zero sum is a deterministic question following a set of fixed rules $\mathcal{C}$. We also saw, that for real numbers, we have to differ between three possible cases for zero sum of a post radix point part of a rational number: $\mathcal{C}^{b^{post}}_{string} \in \{-10^{b^{post}}_{10}, 0^{b^{post}}_{10}, 10^{b^{post}}_{10} \}$.
+
+Assume we want to determine the zero sum of three numbers with $b^{post}$ post radix point bits. For each possible value of $C^{b^{post}}_{string}$ for this one fixed number $b^{post}$ plus the additional $b^{pre}$ bits which always have to sum to a $0$ bit string, we can determine a binary tree $T^{string}$, which gives us all possible rule sequences for getting a zero sum of three numbers.
+
+In \texttt{struct rule C} we save this rule for each node and in \texttt{int list vn} its belonging solutions by pointers to the nodes of $T$ from which we have to take the solution entries which we will determine in the following. Like for tree \texttt{node\_T}, we initialize two null pointers \texttt{struct node\_Tstring *C\_left} and \texttt{struct node\_Tstring *C\_right} which will be used for pointing to the child nodes, later.
+
+Now, with this we can give our \texttt{3SUM} frame algorithm (see listing \ref{lst:3sumframealgorithm}).
+
+\begin{lstlisting}[caption={The \texttt{3SUM} frame algorithm}, label=lst:3sumframealgorithm]
+
+    new node_T T(L,n);
+    new node_Tstring Tstring(empty, empty);
+
+    determineTree_T(T, bit) { |\label{line:determineTreeT}|
+
+         if bit <= (b-1):
+            
+            // Determine T for depth bit
+            T.zero_left = new node_T (empty,0);
+            T.one_right = new node_T (empty,0);
+
+            if T.count != 0:
+                for i=0...(T.count - 1) do
+                    if T.n[i][bit] == 0:
+                        T.zero_left.n.add(T.n[i]);
+                        T.zero_left.count += 1;
+                    elseif T.n[i][bit] == 1:
+                        T.one_right.n.add(T.n[i]);
+                        T.one_right.count += 1;
+
+            determineTree_T(T.zero_left, bit+1);
+            determineTree_T(T.one_right, bit+1);
+
+    };
+
+
+    determineTree_Tstring(pattern, Tstring, bit) {   |\label{line:determineTreeTstring}|
+
+        if bit < (b-1):
+
+            // Determine Tstring for depth bit
+            Tstring.C_left = new node_Tstring(empty,empty);     |\label{line:determineTreeTstringSucStart}|
+            Tstring.C_right = new node_Tstring(empty,empty);        
+         
+            Tstring.C_left.C = successor1(pattern, Tstring.C);
+            Tstring.C_right.C = successor2(pattern, Tstring.C);      |\label{line:determineTreeTstringSucEnd}|
+
+            // Check for solutions for depth bit            |\label{line:checkforsolutions}|
+            if bit == 0:
+                solutions_left = checkForValidSol(Tstring.C_left.C);
+                if solutions_left != empty:
+                    Tstring.C_left.vn.add(sol_tuple(solutions_left));
+
+                solutions_right = checkForValidSol(Tstring.C_right.C);
+                if solutions_right != empty:
+                    Tstring.C_left.vn.add(sol_tuple(solutions_right));
+            elseif bit > 0 and Tstring.vn != empty:
+                for ns in Tstring.vn do                         |\label{line:Tstringvn}|
+                    solutions_left = checkForValidSol(ns, Tstring.C_left.C);        |\label{line:checkleft}|
+                    if solutions_left != empty:
+                        Tstring.C_left.vn.add(sol_tuple(solutions_left));           |\label{line:addleft}|
+
+                    solutions_right = checkForValidSol(ns, Tstring.C_right.C);      |\label{line:checkright}|
+                    if solutions_right != empty:
+                        Tstring.C_left.vn.add(sol_tuple(solutions_right));          |\label{line:addright}|
+
+            determineTree_Tstring(Tstring.C_left, b+1);
+            determineTree_Tstring(Tstring,C_right, b+1);
+        else:
+            return Tstring.vn != empty;  // Final solutions
+
+    };
+
+
+    solve3SUM(T, Tstring) {
+        determineTree_T(T,0);
+        determineTree_Tstring(pattern1, Tstring,0);
+        determineTree_Tstring(pattern2, Tstring,0);
+        determineTree_Tstring(pattern3, Tstring,0);
+    };
+
+\end{lstlisting}
+
+
+The first main part of our frame algorithm is \texttt{determineTree\_T(T,bit)} (see line \ref{line:determineTreeT}). 
+
+\begin{step}[Creation of list entries tree $T$]
+    We create a binary tree $T$ of all list entries $n_{i} = q_{i} = q_{i}x.q_{i}y$ of $L$. We do this by splitting a given \texttt{listnumber list n} in depth \texttt{bit} of the tree, regarding the bit value $n_{i,[bit]}$ of each list entry $n_{i}$. If $n_{i,[bit]} = 0$ then add it to child node \texttt{T.zero\_left.n} and increment \texttt{T.zero\_left.count} by one, else add it to child node \texttt{T.one\_right.n} and increment \texttt{T.one\_right.count} by one.
+\label{step:creationoflistentriestree}
+\end{step}
+
+We finish with a tree $T$ for $b = b^{pre} + b^{post}$ bits with a total depth $b+1$ and a width of $2^{b}$ in depth $b$ (starting indexing the depth with zero). In each depth we have $n$ list elements overall.
+
+Additionally, to the list entries tree $T$, we also manage a second tree, the zero sum rules tree $T^{string}$ by \texttt{determineTree\_Tstring} (Tstring, bit) (see line \ref{line:determineTreeTstring}|).
+
+
+\begin{step}[Creation of zero sum rules tree $T^{string}$]
+    We create a binary tree $T^{string}$ of all zero sum rules $\mathcal{C}_{[q]}$ for one fixed $\mathcal{C}^{b^{post}}_{string}$ and the $\mathcal{C}^{b^{pre}}$ zero sum rule string of zeros, in common $\mathcal{C}^{b}_{string} := \mathcal{C}^{b^{pre}} \circ \mathcal{C}^{b^{post}}_{string}$, regarding the bit \texttt{bit}. For this we take for every \texttt{Tstring.C} its two successor rules according definitions \ref{def:zerosumbitadditionproperties}, \ref{def:zerosumbitadditionrules} and \ref{def:zerosumbitadditionproperties_fixedpointinteger} by $\texttt{pattern} \in \{-10^{b^{post}}_{10}, 0^{b^{post}_{10}}, 10^{b^{post}}_{10} \}$ and add them to the two child nodes of \texttt{Tstring} by \texttt{Tstring.C\_left.C = successor1(pattern, Tstring.C)} and \texttt{Tstring.C\_right.C = successor2(pattern, Tstring.C)} (see lines \ref{line:determineTreeTstringSucStart} to \ref{line:determineTreeTstringSucEnd}). We define the two successors of the empty root node rule by the two $3$ bit rules $\mathcal{C}^{0}_{[0],3}$ and $\mathcal{C}^{1}_{[0],3}$.
+\label{step:creationofzerosumsrulestree}
+\end{step}
+
+We finish with a tree $T^{string}$ for $b = b^{pre} + b^{post}$ bits with a total depth $b+1$ and a width of $2^{b}$ in depth $b$ (also starting indexing the depth with zero). In each depth $b$ we have $2^{b}$ zero sum rules.
+
+Like you maybe already noticed, we left stuff out in our step explanation of the raw frame algorithm (see starting at line \ref{line:checkforsolutions}). We come to this, the solution checks, now. 
+
+\begin{step}[Solution checks]
+    For the identification of valid solutions in depth \texttt{bit}, we have to check for each valid solution of depth \texttt{bit - 1}, given by \texttt{Tstring.vn} (see line \ref{line:Tstringvn}), if the new rule \texttt{Tstring.C\_left.C} respectively \texttt{Tstring.C\_right.C} can be statisfied taking \texttt{ns} into account, at all. This check is done in \texttt{checkForValidSol(ns, Tstring.C\_left.C)} respectively \texttt{checkForValidSol(ns, Tstring.C\_right.C)} (see line \ref{line:checkleft} and \ref{line:checkright}). If the rule \texttt{Tstring.C\_left.C} respectively \texttt{Tstring.C\_right.C} in consideration of \texttt{ns} can be statisfied, it is added to \texttt{Tstring.C\_left.vn} respectively \texttt{Tstring.C\_left.vn} by adding a tuple of three pointers \texttt{sol\_tuple} to the nodes of $T$ from which the three list elements which statisfy the rule of step \texttt{bit} have to be taken (see line \ref{line:addleft} and \ref{line:addright}). If no solution \texttt{ns} from depth \texttt{bit - 1} exists, given by \texttt{T.string.vn == empty}, there exists no possibility anymore for this rule chain to solve the problem, hence this particular branch has to die. For the two rules of the successors of the empty root node, we have the exception that no \texttt{ns} has to be considered, means is this case we have \texttt{Tstring.vn = empty}.
+\label{step:solutionchecks}
+\end{step}
+
+\begin{remark}
+    We want to emphasize that the pointers of \texttt{sol\_tuple} point to the nodes from which we have to take the solution $n_{i}$'s and NOT to the $n_{i}$'s itself!
+\label{remark:soltuplepointers}
+\end{remark}
+
+Finally, we want to give the conditions for \texttt{checkForValidSol(ns := Tstring.vn[i], Tstring.C\_\{*\}.C)}.
+
+\begin{definition}[\texttt{checkForValidSol(Tstring.vn[i], Tstring.C\_\{*\}.C)}]
+    Given a solution tuple \texttt{sol\_tuple} by \texttt{Tstring.vn[i]} of three pointers \texttt{(*pt1, *pt2, *pt3)} which points to the nodes of $T$ of depth \texttt{bit - 1} from which we have to take the three numbers $n_{1}$, $n_{2}$ and $n_{3}$. A rule \texttt{Tstring.C\_*.C} of depth \texttt{bit} leads to a valid solution of \texttt{Tstring.C\_{*}.vn} of depth \texttt{bit} if all of the following conditions are statisfied.
+    
+    \begin{enumerate}
+        \item Condition: The sum of numbers of list entries which are taken for the solution from two child nodes of a common direct parent node, has to be the same number like the number of list entries which where taken for the solution in the step before from their common direct parent node.
+
+            \begin{equation}
+                \begin{split}
+                                & n_{1} \in \left(\texttt{(pt1 -> T).zero\_left.n} \oplus \texttt{(pt1 -> T).one\_right.n}\right)\\
+                    \wedge \quad & n_{2} \in \left(\texttt{(pt2 -> T).zero\_left.n} \oplus \texttt{(pt2 -> T).one\_right.n}\right)\\
+                    \wedge \quad & n_{2} \in \left(\texttt{(pt3 -> T).zero\_left.n} \oplus \texttt{(pt3 -> T).one\_right.n}\right)
+                \label{eq:numberofentriestakenparentchild}
+                \end{split}
+            \end{equation}
+
+        \item Condition: The sum of the number of $0$s which are taken in the current step has to be equal to the value of zeros given by rule $\mathcal{C}$. Also the sum of the number of $1$s which are taken in the current step has to be equal to the value of ones given by rule $\mathcal{C}$.
+
+            \begin{equation}
+                \begin{split}
+                                & |\{ \forall n_{i} \in \left(n_{1}, n_{2}, n_{3}\right) | n_{i} \in \texttt{(pt\{*\} -> T).zero\_left.n} \}| = \texttt{Tstring.C\_{*}.C[0]}\\
+                    \wedge \quad & |\{ \forall n_{i} \in \left(n_{1}, n_{2}, n_{3}\right) | n_{i} \in \texttt{(pt\{*\} -> T).one\_right.n} \}| = \texttt{Tstring.C\_{*}.C[1]}
+                \label{eq:numberof0and1givenbyruleC}
+                \end{split}
+            \end{equation}
+        
+    \label{enum:checkforvalidsol}
+    \end{enumerate}
+
+\label{def:checkforvalidsol}
+\end{definition}
+% ================================================================================
