@@ -1,0 +1,258 @@
+% ================================================================================
+% --------------------------------------------------------------------------------
+\section{Algorithm Complexities}
+\label{s:algorithmcomplexities}
+% --------------------------------------------------------------------------------
+In the last section, we gave our \texttt{3SUM} algorithm in a general way in which we still left out the open question how exactly we determine valid solutions in \texttt{checkForValidSol(Tstring.vn[i], Tstring.C\_\{*\}.C)} and the belonging complexity for doing this. We will give answers to this, now.
+% --------------------------------------------------------------------------------
+\subsection{Basic tree complexities}
+\label{ss:basictreecomplexities}
+% --------------------------------------------------------------------------------
+We assume a serial implementation of the four binary trees $T$, $T^{string}_{pattern1}$, $T^{string}_{pattern2}$ and $T^{string}_{pattern3}$.
+
+\begin{theorem}[Complexities of $T$]
+    The time complexity to generate a list entries binary tree $T$ of total depth $b + 1$ is $\mathcal{O}\left(nb\right)$. Its space complexity is $\mathcal{O}_{Space}\left(nb\right)$.
+\label{theorem:complexitiesofT}
+\end{theorem}
+
+\begin{proof}
+    In the worst case, our given list $L$ consists of $n$ entries, all identically, with each bit either $0$ or with each bit $1$. In each tree depth we get one list with all elements $n$, and $2^{bit} - 1$ empty lists. Hence, in each depth we have a time complexity of $n$. In total this gives us $n\left(b + 1\right)$ and hence $\mathcal{O}\left(nb\right)$. Since we already mentioned, in each depth, the sum of all single list lengths overall always equals $n$, we get a space complexity also by $n\left(b+1\right)$ and hence $\mathcal{O}_{Space}\left(nb\right)$.
+\label{proof:complexitiesofT}
+\end{proof}
+
+Next, we look at the complexities of a zero sum rule tree $T^{string}_{pattern}$ for \texttt{pattern}. We see that the complexity of our algorithm part depends on \texttt{checkForValidSol(Tstring.vn[i], Tstring.C\_\{*\}.C)} for all \texttt{ns} and \texttt{Tstring.C\_\{*\}.C)} in a particular depth $\texttt{bit}$. We want to examine the specific properties of this algorithm part. 
+
+Regarding our rules given by definitions \ref{def:zerosumbitadditionproperties}, \ref{def:zerosumbitadditionrules} and \ref{def:zerosumbitadditionproperties_fixedpointinteger}, we know that we can only have some specific combinations for taking our three numbers from zero and from one bit representing nodes in depth \texttt{bit}. Since, we just have the possible rules $\mathcal{C}\left(0,3\right)$, $\mathcal{C}\left(3,0\right)$, $\mathcal{C}\left(1,2\right)$ and $\mathcal{C}\left(2,1\right)$ we get the following possible \texttt{ns} with rule $\mathcal{C}$ combinations for which we have to check if ...
+
+\begin{enumerate}
+
+    \item In step \texttt{bit - 1} we take all three numbers from one $node$.\\
+        For step \texttt{bit} we have:        
+        \begin{enumerate}
+            \item Two child nodes $child_{1} := node.zero$ and $child_{2} := node.one$.
+            
+            \begin{enumerate}
+                \item Case $\mathcal{C}\left(0,3\right)$:
+                    \begin{enumerate}
+                        \item $child_{2}.count \geq 3$
+                    \end{enumerate}
+                \item Case $\mathcal{C}\left(3,0\right)$:
+                    \begin{enumerate}
+                        \item $child_{1}.count \geq 3$
+                    \end{enumerate}
+
+                \item Case $\mathcal{C}\left(1,2\right)$:
+                    \begin{enumerate}
+                        \item $child_{1}.count \geq 1 \wedge child_{2}.count \geq 2$
+                    \end{enumerate}
+                \item Case $\mathcal{C}\left(2,1\right)$:
+                    \begin{enumerate}
+                        \item $child_{1}.count \geq 2 \wedge child_{2}.count \geq 1$
+                    \end{enumerate}
+            \end{enumerate}
+        \end{enumerate}
+
+    \item In step \texttt{bit - 1} we take one number from $node_{1}$ and two numbers from $node_{2}$.\\
+        For step \texttt{bit} we have:
+         \begin{enumerate}
+            \item Four child nodes $child_{1} := node_{1}.zero$, $child_{2} := node_{1}.one$, $child_{3} := node_{2}.zero$ and $child_{4} := node_{2}.one$.
+            \begin{enumerate}
+                \item Case $\mathcal{C}\left(0,3\right)$:
+                    \begin{enumerate}
+                        \item $child_{2}.count \geq 1 \wedge child_{4}.count \geq 2$
+                    \end{enumerate}
+                \item Case $\mathcal{C}\left(3,0\right)$:
+                    \begin{enumerate}
+                        \item $child_{1}.count \geq 1 \wedge child_{3}.count \geq 2$
+                    \end{enumerate}
+        
+                \item Case $\mathcal{C}\left(1,2\right)$:
+                    \begin{enumerate}
+                        \item $child_{1}.count \geq 1 \wedge child_{4}.count \geq 2$
+                        \item $child_{2}.count \geq 1 \wedge child_{3}.count \geq 1 \wedge child_{4}.count \geq 1$
+                    \end{enumerate}
+                \item Case $\mathcal{C}\left(2,1\right)$:
+                    \begin{enumerate}
+                        \item $child_{1} \geq 1 \wedge child_{3}.count \geq 1 \wedge child_{4}.count \geq 1$
+                        \item $child_{2} \geq 1 \wedge child_{3}.count \geq 2$
+                    \end{enumerate}
+            \end{enumerate}
+        \end{enumerate}
+    
+    \item In step \texttt{bit - 1} we take one number from $node_{1}$, one number from $node_{2}$ and one number from $node_{3}$.\\
+        For step \texttt{bit} we have:
+
+        \begin{enumerate}
+            \item Six child nodes $child_{1} := node_{1}.zero$, $child_{2} := node_{1}.one$, $child_{3} := node_{2}.zero$, $child_{4} := node_{2}.one$, $child_{5} := node_{3}.zero$ and $child_{6} := node_{3}.one$.
+
+            \begin{enumerate}
+                \item Case $\mathcal{C}\left(0,3\right)$:
+                    \begin{enumerate}
+                        \item $child_{2}.count \geq 1 \wedge child_{4}.count \geq 1 \wedge child_{6}.count \geq 1$
+                    \end{enumerate}
+                \item For $\mathcal{C}\left(3,0\right)$:
+                    \begin{enumerate}
+                        \item $child_{1}.count \geq 1 \wedge child_{3}.count \geq 1 \wedge child_{5}.count \geq 1$
+                    \end{enumerate}
+        
+                \item Case $\mathcal{C}\left(1,2\right)$:
+                    \begin{enumerate}
+                        \item $child_{1}.count \geq 1 \wedge child_{4}.count \geq 1 \wedge child_{6}.count \geq 1$
+                        \item $child_{2}.count \geq 1 \wedge child_{3}.count \geq 1 \wedge child_{6}.count \geq 1$
+                        \item $child_{2}.count \geq 1 \wedge child_{4}.count \geq 1 \wedge child_{5}.count \geq 1$
+                    \end{enumerate}
+                \item Case $\mathcal{C}\left(2,1\right)$:
+                    \begin{enumerate}
+                        \item $child_{1}.count \geq 1 \wedge child_{3}.count \geq 1 \wedge child_{6}.count \geq 1$
+                        \item $child_{1}.count \geq 1 \wedge child_{4}.count \geq 1 \wedge child_{5}.count \geq 1$
+                        \item $child_{2}.count \geq 1 \wedge child_{3}.count \geq 1 \wedge child_{5}.count \geq 1$
+                    \end{enumerate}
+            \end{enumerate}
+        \end{enumerate}
+
+\label{enum:nsCcases}
+\end{enumerate}
+
+
+We see that it is not necessary to check for specific $n_{i}$ values. Instead, we only have to check if the particular lists have at least as much numbers as necessary to statisfy the given \texttt{ns} with rule $\mathcal{C}$ combination. This property makes our algorithm independent from the total number of $n$'s of $L$ and it only become hooked on the number of distinguishable elements of $L$ which is given by $2^{b}$.
+
+So, we can split \texttt{checkForValidSol(Tstring.vn[i], Tstring.C\_\{*\}.C)} intro three parts: The first one, in which we have to determine the valid combinations of nodes for which we have to check their $count$ values for a given \texttt{ns} with $\mathcal{C}$ case. The second, in which we have to determine for all nodes if their $count$ values are at least $1$, $2$ and $3$. And finally the third part, in which we have to bring the first two parts together to determine which combinations of nodes can be statisfied, at all.
+
+We want to start with the determination of the maximal number of \texttt{ns} tuples in a particular depth \texttt{bit} of $T^{string}_{pattern}$. Since, we part in each depth step in $T$ our list of $n$ numbers regarding their bit values, we can associate the \texttt{ns} solutions in depth \texttt{bit}, with the solutions of the \texttt{3SUM} problem statements with numbers of \texttt{bit} bits. Hence, we are interested in the maximal number of solutions for the \texttt{3SUM} problem of a list of $n := 2^{bit}$ pairwise distinguishable numbers represented by \texttt{bit} bits each in their binary representation.   
+
+
+\begin{lemma}[Maximal number of solutions of pairwise distinguishable numbers]
+    The maximal number of valid solution triples for the zero sum problem of $n$ pairwise distinguishable numbers is $\frac{1}{4}n^{2} - \frac{1}{2}n$.
+\label{lemma:maximalnumberofsoldisnumbers}
+\end{lemma}
+
+
+\begin{proof}
+    Regarding the zero sum question of three numbers, we know that the sum of three time zero, as well as the sum of two positive numbers and one negative number, and the sum of two negative numbers and one positive number can statisfy the question. We assume given is a sequence of $n$ pairwise distinguishable numbers. Be number $n_{1} > 0$, $n_{2} := k$ and $n_{3} = -\left(n_{1} + k\right)$. Additionally, be $\min\left(|n_{1}|, |n_{2}|, |n_{3}|\right) = |n_{1}|$ and $n_{1} + k \leq n$. Then, we have $n - 2n_{1}$ choices for $k$ and the maximal number of valid solution triples is given by $\sum_{n_{1} = 1}^{n/2} \left(n - 2n_{1}\right) = \frac{1}{2}n - \frac{1}{4}n^{2} - \frac{1}{2}n = \frac{1}{4}n^{2} - \frac{1}{2}n$.
+\label{proof:maximalnumberofsoldisnumbers}
+\end{proof}
+
+
+Next, we have to think about the maximal number of possible combinations to check which we have to do for one \texttt{ns}.
+
+\begin{lemma}[Maximal number of solution node combinations for one \texttt{ns}]
+    The maximal number of solution node combinations for one \texttt{ns} in a particular depth \texttt{bit} regarding given rules takes four.
+\label{lemma:maximalnumberofsolnodecombonens}
+\end{lemma}
+
+\begin{proof}
+    From the results of the consideration of possible \texttt{ns} with $\mathcal{C}$ situations as well as from lemma \ref{lemma:maximalnumberofsoldisnumbers} by $\approx \left(2^{bit + 1}\right)^2 = 2^{2} 2^{2 \, bit} = 2^{2} \left(2^{bit}\right)^{2}$, we can derive, that the maximal number of node combinations which we have to check for one \texttt{ns} turns out to be four. From symmetry aspects of $\mathcal{C}$ rules, we know that for each \texttt{ns} we always have two possible rules and that one of this rules is of the form in which all three numbers are either $0$ or all three are $1$, together with the second rule in which one number is either $0$ or $1$ and we take the two numbers from the other set. This leads to a maximal number of possible node combinations of four.
+\label{proof:maximalnumberofsolnodecombonens}
+\end{proof}
+
+\begin{lemma}[Maximal number of \texttt{ns} per node]
+    The maximal number of \texttt{ns} for each node in depth \texttt{bit} equals $2^{1.58 \cdot bit}$.
+\label{lemma:maximalnumberofnspernode}
+\end{lemma}
+
+\begin{proof}
+    From the former considerations we know that we have until three possible combinations for each \texttt{ns} with one particular $\mathcal{C}$. Hence, it follows for depth \texttt{bit} a maximal number of \texttt{ns}'s for each node by $3^{bit - 1} = 2^{\log_{2}\left(3\right)\left(bit - 1\right)} \approx 2^{1.58 \left(bit - 1\right)} \approx 2^{1.58 \cdot bit}$.
+\label{proof:maximalnumberofnspernode}
+\end{proof}
+
+Since, we now know how much \texttt{ns} tuple we have, we can determine the complexity to determine the combinations of nodes for which we have to check their $count$ values in a particular depth \texttt{bit}. 
+
+\begin{lemma}[Complexity of valid combinations determination]
+    The time complexity to determine all possible valid combinations of nodes for depth \texttt{bit} takes $\mathcal{O}\left(2^{1.58 \cdot bit}\right)$ and its space complexity takes $\mathcal{O}_{Space}\left(2^{1.58 \cdot bit}\right)$.
+\label{lemma:complexityvalidcombdet}
+\end{lemma}
+
+
+\begin{proof}
+    We know for depth \texttt{bit} that we have $2^{bit}$ nodes. Each of this nodes can have maximal $2^{1.58 \cdot bit}$ tuples \texttt{ns}, with maximal three new valid combinations in depth \texttt{bit + 1}. Since, in a binary tree we consider all nodes in parallel, we get $3 \cdot 2^{1.58 \cdot bit}$ valid combinations and a time complexity of $\mathcal{O}\left(3 \cdot 2^{1.58 \cdot bit}\right) = \mathcal{O}\left(2^{1.58 \cdot bit}\right)$. For each valid combination we have to save three node count value pointers. Hence, we get a space complexity by $\mathcal{O}_{Space}\left(3 \cdot 3 \cdot 2^{1.58 \cdot bit}\right) = \mathcal{O}_{Space}\left(2^{1.58 \cdot bit}\right)$.
+\label{proof:complexityvalidcombdet}
+\end{proof}
+
+Now, we look at our second part of \texttt{checkForValidSol(Tstring.vn[i], Tstring.C\_\{*\}.C)}. Considering a tree $T^{string}_{pattern}$. We are interested in the time and space complexity of doing all necessary checks of \texttt{T.count} values which we need finally for the determinded valid combination checks.
+
+\begin{lemma}[Checks of all $T.count$ values complexities for a fixed depth \texttt{bit}]
+    Given a binary tree $T$ at depth \texttt{bit}. The time complexity for doing all necessary checks of $T.count$ values for determining valid \texttt{ns} with \texttt{Tstring.C} combinations for a fixed depth takes $\mathcal{O}\left(1\right)$ time and $\mathcal{O}_{Space}\left(2^{bit}\right)$ space complexity.
+\label{lemma:Tdscountcomplexities}
+\end{lemma}
+
+\begin{proof}  
+    If we have a binary tree $T$, we know that the number of nodes in depth \texttt{bit} is given by $2^{bit}$. Because of the definitions \ref{def:zerosumbitadditionproperties} and \ref{def:zerosumbitadditionproperties_fixedpointinteger}, we know that we have to check nodes for $T.count \geq 1$, $T.count \geq 2$ and $T.count \geq 3$. In the worst case, we have to check each node for each of this three values. This leads to $3 \cdot 2^{bit}$ necessary checks in depth \texttt{bit}. Since all checks happen independently from each other in a binary tree, we can do it with $\mathcal{O}\left(3\right) = \mathcal{O}\left(1\right)$ time and $\mathcal{O}_{Space}\left(3 \cdot 2^{bit}\right) = \mathcal{O}_{Space}\left(2^{bit}\right)$ space complexity.
+\label{proof:Tdscountcomplexity}
+\end{proof}
+
+We save the results of our $T.count$ checks for example in a simple $3 \times 2^{bit}$ matrix and can now use it to check our determined valid combinations.
+
+\begin{lemma}[Checks of valid combinations complexity]
+    The time complexity to check all valid combinations in a particular depth \texttt{bit} takes $\mathcal{O}\left(2^{1.58 \cdot bit}\right)$.
+\label{lemma:checkofvalidcombinationscompl}
+\end{lemma}
+
+
+\begin{proof}
+    We know for depth \texttt{bit}, that we have maximal $3 \cdot 2^{1.58 \cdot bit}$ possible valid combinations to check for at each node. Since, we have to check for each node three count values, we get a time complexity by $\mathcal{O}\left(3 \cdot 3 \cdot 2^{1.58 \cdot bit}\right) = \mathcal{O}\left(2^{1.58 \cdot bit}\right)$.
+\label{proof:checksofvalidcombinationscompl}
+\end{proof}
+
+With this we have the complexities of one $T^{string}_{pattern}$.
+
+\begin{theorem}[Complexities of $T^{string}_{pattern}$]
+    The time complexity of a binary tree $T^{string}_{pattern}$ to determine all valid solutions of total depth $b + 1$ for one fixed given \texttt{pattern} is $\mathcal{O}\left(2^{1.58 \cdot b}\right)$. Its space complexity is given by $\mathcal{O}_{Space}\left(2^{1.58 \cdot b}\right)$.
+\label{theorem:complexitiesofTstringpattern}
+\end{theorem}
+
+
+\begin{proof}
+    Regarding the time complexity, we know that we take $2^{1.58 \cdot bit}$ for each depth \texttt{bit}. Hence, we need a total time of $\approx \sum_{bit = 1}^{b} 2^{1.58 \cdot bit} \approx 2^{1.58 \cdot b}$ and with our former considerations we get for space usage $\approx \sum_{bit = 1}^{b} \left(2^{bit} + 2^{1.58 \cdot bit}\right) \approx 2^{b} + 2^{1.58 \cdot b} \approx 2^{1.58 \cdot b}$.
+\label{proof:complexitiesofTstringpattern}
+\end{proof}
+
+Finally, we can give the total complexities for our \texttt{3SUM} algorithm for a serial implementation of the binary trees $T$ and $T^{string}_{pattern}$.
+
+\begin{theorem}[Complexities of \texttt{3SUM} for rational numbers]
+    Given a list $L$ of $n$ rational numbers $n_{i} := q_{i} \in \mathbb{Q}$ on an universe size of $U := 2^{b}$ distinguishable numbers with $b := 1 + b^{pre} + b^{post}$. The time complexity to determine all valid solutions of \texttt{3SUM} takes $\mathcal{O}\left(nb + U^{1.58}\right)$. Its belonging space complexity is $\mathcal{O}_{Space}\left(nb + U^{1.58}\right)$.
+\label{theorem:complexitiesof3sumrationalnumbers}
+\end{theorem}
+
+
+\begin{proof}
+    We have one binary tree $T$ and three binary trees $T^{string}_{pattern}$, for each of the three \texttt{pattern}s one. With our results of theorem \ref{theorem:complexitiesofT} and \ref{theorem:complexitiesofTstringpattern} we get $nb + 3 \cdot 2^{1.58 \cdot b} = nb + 3 \cdot U^{1.58}$ and hence the complexities are given by $nb + U^{1.58}$.
+\label{proof:complexitiesof3sumrationalnumbers}
+\end{proof}
+% --------------------------------------------------------------------------------
+\subsection{Irrational Numbers}
+\label{ss:irrationalnumbers}
+% --------------------------------------------------------------------------------
+So far, we considered a list $L$ of $n$ rational numbers $n_{i} := q_{i} \in \mathbb{Q}$. Now, we will analyse the case of $n_{i} \in \mathbb{R}$.
+
+In section \ref{ss:realnumbers} we saw, that we can map the question of zero sum of irrational numbers to the question of zero sum of rational numbers. During our definition of the data type \texttt{fixedint} we used this, to define each number $n_{i}$ by a list of sub numbers $n_{i,j}$ (see step \ref{step:assumptions}) together with a mapping between the rational representing parts of irrational numbers to their belonging irrational numbers.
+
+
+\begin{theorem}[Complexities of \texttt{3SUM} for real numbers]
+    Given a list $L$ of $n$ real numbers by $n_{i} := q_{i,0} + \sum_{ \forall i_{a,i,j} \mathbb{I}_{a}} i_{a,i,j}q_{i,j}$, with $q_{i,j} \in \mathbb{Q}$ and $|\mathbb{I}_{a}| < \infty$ according our definition \ref{def:realnumbersnof3sumL} and each $q_{i,j}$ on an universe of $U := 2^{b}$ distinguishable numbers with $b := 1 + b^{pre} + b^{post}$. The time complexity to determine all valid solutions of \texttt{3SUM} takes $\mathcal{O}\left(nb|\mathbb{I}_{a}| + U^{1.58}_{\mathbb{I}_{a}}\right)$ on an universe of $U_{\mathbb{I}_{a}} := 2^{b |\mathbb{I}_{a}|}$ distinguishable numbers $n_{i}$. Its belonging space complexity is $\mathcal{O}_{Space}\left(nb|\mathbb{I}_{a}| + U^{1.58}_{\mathbb{I}_{a}}\right)$.
+\label{theorem:complexitiesof3sumrealnumbers}
+\end{theorem}
+
+
+\begin{proof}
+    For rational numbers we only considered the case of $n_{i} := q_{0}$. If we extend our numbers to real numbers, we simple have to concatenate $|\mathbb{I}_{a}| + 1$ (the $|\mathbb{I}_{a}|$ ones representing atomic irrational ones, plus the one rational part $q_{0}$) single $b$ bit long rational cases. We can consider them like one long $b\left(|\mathbb{I}_{a}| + 1\right)$ bit long integer representation. Have attention that even we go through it like through one integer, at the crossing points from one rational representing to the next, we don't move carriers and successor rules. Instead we start with  the carrier and rule situation like for a bit position zero again.
+
+For $T$ it is clear that we go through $n$ numbers of bit length $b\left(|\mathbb{I}_{a}| + 1\right)$ to sort our list of numbers regarding their bit representation, now.
+
+If we look at $T^{string}_{pattern}$ we have to remember, that we have three \texttt{pattern} trees for each rational number. Assume we already went through the first $b$ bits of our new tree $T^{string}$ tree of totally $b\left(|\mathbb{I}_{a}| + 1\right)$ bits for one specific \texttt{pattern}. To get all possible solutions for one rational number, we have to do this also for the two other pattern cases, so that we get a time and space usage of $\approx 2^{1.58 \cdot b}$ until this point. Since, with this we have the complete solution set for our first rational number, we can put this three part solutions together to one large solution set, by putting all part solutions equal to one tree at depth $b$, so that at each tree node we have now maximal $ 2^{1.58 \cdot b}$ \texttt{ns} values at each node. Have attention, that we know that the maximal number of solutions of three patterns together can be maximal $2^{2b}$ and hence we still have maximal $2^{1.58 \cdot b}$ tuples \texttt{ns} at each of our nodes and not $3 \cdot 2^{1.58 \cdot b}$. We can put the three solution sets together efficiently by considering all three pattern trees as one tree with tree separated data structures for \texttt{ns}'s and $\mathcal{C}$'s. Because of symmetry properties of final solution sets given by symmetries in $\mathcal{C}$, we can merge this tree data structures if we reached depth $b$ to one tree, to get our complete tree for the first rational number. In the same way, we now go further through our new merged tree until $2b$ with time and space usage of $2^{1.58 \cdot 2b}$, and so on. 
+
+With this we get for the necessary time and also each space $nb\left(|\mathbb{I}_{a}| + 1\right) + 2^{b\left(|\mathbb{I}_{a}| + 1\right) \cdot 1.58}$.
+\label{proof:complexitiesof3sumrealnumbers}
+\end{proof}
+% --------------------------------------------------------------------------------
+\subsection{Possible Algorithm Variations}
+\label{ss:possiblealgorithmvariations}
+% --------------------------------------------------------------------------------
+The mentioned algorithm is designed as serial implementation. Since, it is clear that in real applications, only a finite parallelization with also some additional restrictions is possible, we not want to look closer in improvement options and instead only give an overview of them, how our algorithm could be varied, depending on the given physical resources.
+
+\begin{itemize}
+    \item In the presented version, if we have \texttt{Tstring.vn == empty}, we still take it to the next step until the end. To let a binary tree branch die and removing the whole branch in this case, would be a much more efficient version regarding time as well as space complexity.
+    \item We receive a power of $1.58$ for our universe $U := 2^{b}$ in our final complexity since we can get until three possible valid combinations for a particular \texttt{ns} tuple with a particular rule $\mathcal{C}^{\alpha}$, during the same time we get for the same \texttt{ns} tuple and the second rule $\mathcal{C}^{\beta}$ one valid combination because of always $\mathcal{C}^{\alpha} \in \{ \left(1,2\right), \left(2,1\right) \}$ and $\mathcal{C}^{\beta} \in \{ \left(0,3\right), \left(3,0\right) \}$. By putting all four valid combination determinations and their calculations at first into a common higher saving structure with information pointers regarding their belonging rule, we can split instead the the total set of four into two sub parts with each two valid combination determinations, for parallel determination of two possiblities. In this way we can reduce the total complexity to $U$ instead of $U^{1.58}$. The disadvantage of this approach is a much higher need of memory space and physical time consuming actions for managing the pointers of rule with node connection informations.
+    \item If we have enough resources, we can use the trees $T$, $T^{string}_{pattern1}$, $T^{string}_{pattern2}$ and $T^{string}_{pattern3}$ in parallel. For this we have to consider that if we reach depth \texttt{bit} in tree $T^{string}$, we only still need depth \texttt{bit + 1} in tree $T$. So, we could run this two trees in parallel with one step delay, the elder dephts of both trees are no longer necessary and can be removed to save space. We can extend this parallelization of course also on all three pattern trees.
+\label{itemize:possiblealgorithmvariations}
+\end{itemize}
+% ================================================================================
