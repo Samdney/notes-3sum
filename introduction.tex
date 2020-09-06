@@ -51,18 +51,21 @@ The lower bound of computational complexity of \texttt{3SUM} is a long standing 
 
 In this work, we want to present a new kind of algorithm design, different compared to the mentioned works. We can see, that apart from Seidel's  \cite{edelsbrunner1986constructing} Fast Fourier transformation and Baran, Demaine and Pǎtra{\c{s}}cu's \cite{baran2005subquadratic} work which used randomized universe reducation, word packing and table lookups, for \texttt{Int3SUM}, these works are all mainly based on decision trees and queries depending on the numbers of $S$ in decimal representation. We not want to do this kind of approach again. Instead, we will use a new angle of view based on the binary representation of the numbers of $S$ and the characteristics of binary addition.
 % --------------------------------------------------------------------------------
-\subsection{Our Contributions}
-\label{ss:ourcontributions}
-% --------------------------------------------------------------------------------
-TODO
-% --------------------------------------------------------------------------------
 \subsection{Our Results}
 \label{ss:ourresults}
 % --------------------------------------------------------------------------------
-TODO
+In this work, we start with the basic idea of using an algorithm for the \texttt{3SUM} problem on the binary representation level of numbers in a computer system, which means using the nature of binary number addition on a bit level instead of comparing the numbers in their total representation.
+
+The first problem which raises are the set of irrational numbers, since their can't be represented exactly by a finite number of bits. We show that we can solve this problem by a mapping of irrational numbers to a zero sum question of their rational factors, instead. To reach this, we introduce a concatenation representation of real numbers $n_{i}$, based on a finite set $\mathbb{I}_{a}$ of so called \textit{Atomic irrational numbers}.
+
+Since, we see that we are able to solve the real number problem by solving the problem for rational numbers, we examine existing representations like \textit{Floating-point arithmetic} and \textit{Fixed-point arithemetic}. Since, both of this representations would raise the complexity of our algorithm idea exponentially, we introduce so called \textit{Fixed-point integer arithmetic}. This way of representation of a rational number consists simple by represent the pre radix point part of our number by one integer and the post radix point part of our number by a second additional integer. Although, obviously standard binary addition for the whole number in this way is no longer possible, this way of representation gives us the possiblity to save space and time.
+
+We examine the properties of the zero sum addition of three integer numbers and receive a set of rules $\mathcal{C}$ which tells us how much $0$s and how much $1$s we need, by a given carrier $c{[q]}$ at bit position $q$, to receive a zero sum bit at position $q$. Since, the successors of such rules turn out to be unique, we can take this rules to determine valid soulutions.
+
+For this we define two kinds of binary trees: a list entries tree $T$ which contains the given list numbers $n_{i}$ and string trees $T^{string}$ which constains the given rules and the final solutions after $b + 1$ bit depth steps. By connecting this two tree kinds we receive for the \texttt{3SUM} problem of a list $L$ of $n$ elements, a time complexity of $\mathcal{O}\left(nb + U^{1.58}\right)$ and space complexity of $\mathcal{O}_{Space}\left(nb + U^{1.58}\right)$ for an universe of $U := 2^{b}$ distinguishable rational numbers and $\mathcal{O}\left(nb|\mathbb{I}_{a}| + U^{1.58}_{\mathbb{I}_{a}}\right)$ on an universe of $U_{\mathbb{I}_{a}} := 2^{b |\mathbb{I}_{a}|}$ distinguishable real numbers $n_{i}$ with a space complexity $\mathcal{O}_{Space}\left(nb|\mathbb{I}_{a}| + U^{1.58}_{\mathbb{I}_{a}}\right)$, too.
 % --------------------------------------------------------------------------------
-\subsection{An Overview}
-\label{ss:anoverview}
+\subsection{Organization}
+\label{ss:organization}
 % --------------------------------------------------------------------------------
-TODO
+Our paper is organized as follows. In section \ref{s:preliminaries}, we start with giving some necessary basic definitions and notations. In section \ref{s:zerosumbitaddition}, we discuss basic properties of real numbers, the necessities of a particular way of irrational number representation and deriving from this, we introduce \textit{Atomic irrational numbers}. Then, we determine the characteristics of zero sum addition on a binary representation level of numbers, to derive a set of rules, which we use for our \texttt{3SUM} algorithm in section \ref{s:thegeneralalgorithm}. Finally, in section \ref{s:algorithmcomplexities} we discuss the belonging complexities of our presented algorithm.
 % ================================================================================
