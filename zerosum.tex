@@ -1,0 +1,329 @@
+% ================================================================================
+% --------------------------------------------------------------------------------
+\section{Zero Sum Bit Addition}
+\label{s:zerosumbitaddition}
+% --------------------------------------------------------------------------------
+In this paper, we want to introduce a binary representation based algorithm. Mostly, if people talk about binary algorithms, they mean two decision algorithms, like binary trees, which divide possible solutions sets into two subsets. We want explicitly focuse on the binary representation of integers and real numbers in typical computer designs, today. Regarding the \texttt{3SUM} problem we are particularly interested in the zero sum bit addition of three numbers. We look at this problem statement for integers and for the set of real numbers to deduce a set of constraint rules. Let's start with a general treatment of the set of real numbers, at first.
+% --------------------------------------------------------------------------------
+\subsection{Real Numbers}
+\label{ss:realnumbers}
+% --------------------------------------------------------------------------------
+Considering a set of given real numbers $n \in \mathbb{R}$, we have to differ between several kinds of numbers, which are integers $z \in \mathbb{Z}$, rational $q \in \mathbb{Q}$ and irrational $i \in \mathbb{R} \setminus \mathbb{Q}$ numbers. Since integers are a subset of rational numbers which can be written by $z/1$, we only have to differ in practice between rational and irrational numbers, regarding the problem of finite precision of representation of a number on a computer system and the question how we can decide if the sum of three numbers of possible irrational cases is zero or not. 
+
+At first, we need to take a short look at the character of irrational numbers, in generally. Irrational numbers are numbers which can not be presented by a fraction $\frac{z_{1}}{z_{2}}$, $z_{1}, z_{2} \in \mathbb{Z}$. The most known irrational numbers are $\pi$, $e$ but also $\sqrt{2}$. Although this numbers play an important role, there are still some unsolved questions regarding them. At first it is not know if for all cases of $i_{1}i_{2}$ with $i_{1}, i_{1} \in \mathbb{R} \setminus \mathbb{Q}$, the product is still also an irrational number. Until now, there couldn't be found a counterexample but also no general proof that all cases are leading to irrational numbers \cite{Irration5:online}. As second, it is also not known if the linear combination of two irrational numbers by $q_{1} i_{1} + q_{2} i_{2}$ with $q_{1}, q_{2} \in \mathbb{Q}$ is always an irrational number \cite{Irration5:online} \cite{PifromWo5:online}, too. Finally, it exists just an assumption but no proof for the irrational nature of the numbers $2^{e}$, $\pi^{e}$, $\pi^{\sqrt{2}}$, $\pi^{\pi}$, $e^{e}$ and $\gamma$ (the Euler–Mascheroni constant) \cite{Irration5:online}. Because of this unsolved questions, we want to introdude irrational numbers regarding the \texttt{3SUM} problem in a specific way. For this, we introduce \texttt{Atomic irrational numbers}.
+
+\begin{definition}[Atomic irrational numbers]
+    Given a finite set $\mathbb{I}_{a}$ of irrational numbers $i_{a} \in \mathbb{R} \setminus \mathbb{Q}$. We call this numbers \textbf{Atomic irrational numbers} if they statisfy all of the following properties:
+
+    \begin{enumerate}
+        \item For all $i_{a,1}, i_{a,2} \in \mathbb{I}_{a}$, we have $i_{a,2} \neq q i_{a,2}$, $\forall q \in \mathbb{Q}$.
+        \item For all $i_{a,1}, i_{a,2}, i_{a,3} \in \mathbb{I}_{a}$, we have $i_{a,3} \neq q_{1} i_{1} + q_{2} i_{2}$, $\forall q_{1}, q_{2} \in \mathbb{Q}$.
+        \item We are in the know of the properties $q_{1} i_{a,1} + q_{2} i_{a,2} = q_{a,3} \in \mathbb{Q}$ for all $i_{a,1}, i_{a,2}, i_{a,3} \in \mathbb{I}_{a}$ if such cases exist. Means we know the complete tuples $\left(q_{1}, i_{a,1}, q_{2}, i_{a,2}, q_{3}\right)$.
+    \label{enum:atomicrirationalnumbers}
+    \end{enumerate}
+
+\label{def:atomicirrationalnumbers}
+\end{definition}
+
+Now, we want to take attention on the possibility to present a real number $n$ itself by a given combination of several single numbers, too. Following from this, we can write for a complete description of possible cases of a real number $n = q_{1}q_{2} + q_{3}i_{1} + i_{2}i_{3}$, with $q_{j} \in \mathbb{Q}$ and $i_{j} \in \mathbb{R} \setminus \mathbb{Q}$.
+
+Let's look at the sum of the three real numbers $n_{1}$, $n_{2}$ and $n_{3}$ with keeping this description in mind. We know that an irrational number $i$ can only disappear as the result of the addition of several numbers $n$, if this number $i$ respectively its multiples are element of some of this numbers $n$. An irrational number $i_{1}$ can not be eliminated by neither an other irrational number $i_{2} \neq i_{1}$ and their multiples nor by any rational number. In addition we know that $q_{1}q_{2},  \in \mathbb{Q}$ and $q_{3}i_{1} \in \mathbb{R} \setminus \mathbb{Q}$. If $i_{2}$ and $i_{3} \in \mathbb{I}_{a}$, we also know that $i_{2}i_{3} \in \mathbb{R} \setminus \mathbb{Q}$. This leads to the point that for further steps of solving the \texttt{3SUM} problem, we have to split $n$ into two parts: the one with the rational summands $q_{1}q_{2}$ and the one with the irrational summands $q_{3}i_{1}$ and $i_{2}i_{3}$. We see for the irrational summands that we either have again the product of several irrational numbers or the product of one irrational and one rational number. Hence, in generally we can write for the three sum of this kind of summands $i_{i}i_{j} \cdots i_{k}i_{l}\left(q_{1} + q_{2} + q_{3}\right)$ and we see, that if we are able to identify and flag an irrational number clearly as irrational, it becomes not necessary to save its specific value and our zero sum problem can be reduced to a rational zero sum problem for this specific summand, too. Now, with this, we define our real numbers $n$.
+
+\begin{definition}[Real numbers $n$ of a \texttt{3SUM} list $L$]
+    We define all numbers $n_{i} \in \mathbb{R}$ of a \texttt{3SUM} list $L$ by $n_{i} := q_{i,0} + \sum_{ \forall i_{a,i,j} \mathbb{I}_{a}} i_{a,i,j}q_{i,j}$, with $q_{i,j} \in \mathbb{Q}$ and $|\mathbb{I}_{a}| < \infty$. If cases of kind $q_{1} i_{a,1} + q_{2} i_{a,2} = q_{a,3} \in \mathbb{Q}$ exist, we solve them each for one of its two given irrational numbers $i_{a,1}$ and substitute all appearances of $i_{a,1}$ in all numbers $n_{i}$ by this. In this way we get everywhere left with $i_{a,2}$ and we add the rational part $q_{a,3}$ to $q_{0}$.
+\label{def:realnumbersnof3sumL}
+\end{definition}
+
+Later in our algorithm, we will see, why this last part of our definition is necessary to get all possible solutions and to avoid troubles with the mentioned special cases.
+
+With this insights, we will examine the zero sum binary addition for integers and for rational numbers, in the following.
+% --------------------------------------------------------------------------------
+\subsection{Integer Binary Addition}
+\label{ss:integerbinaryaddition}
+% --------------------------------------------------------------------------------
+We assume that given are three integers $z_{1}$, $z_{2}$ and $z_{3}$ and their belonging bit strings $B^{N-1}_{n_{1}}$, $B^{N-1}_{n_{2}}$ and $B^{N-1}_{n_{3}}$. We want to analyse the zero sum binary addition of this three numbers. Negative numbers are given in two's complement representation and hence the universe of values for each integer is given by $[-2^{N-1}, 2^{N-1} - 1]$. For this, we go through the binary addition of three integers (see also table \ref{tab:binaddthreeintmaxcarrier}) and determine several rules regarding possible addition partners for getting a zero sum.
+
+\begin{table}[htp]
+\caption{Binary addition of three integers with maximal carrier.}
+\label{tab:binaddthreeintmaxcarrier}
+\centering
+\vspace{0.3cm}
+    \begin{tabular}{ccccccccc}
+         &  & 1 &  & 1 &  &  & & \\
+        1 & 0 & 1 & 0 & 1 & 0 & 1 & & \\
+        \hline
+        $\cdots$ & $\cdots$ & 1 & 1 & 1 & 1 & 1 & 1 & \\
+        $\cdots$ & $\cdots$ & 1 & 1 & 1 & 1 & 1 & 1 & \\
+        $\cdots$ & $\cdots$ & 0 & 0 & 0 & 0 & 1 & 0 & \\
+        \hline
+        $\cdots$ & $\cdots$ & 0 & 0 & 0 & 0 & 0 & 0 & \\
+        $\cdots$ & $\cdots$ & \footnotesize{5} & \footnotesize{4} & \footnotesize{3} & \footnotesize{2} & \footnotesize{1} & \footnotesize{0} & \footnotesize{q}\\
+    \end{tabular}
+\end{table}
+
+\begin{theorem}[Carriers $c_{[q]}$]
+    The zero sum binary addition $z_{1} + z_{2} + z_{3} = 0$ of three integers has the possible carriers $c_{[q]} \in \{0, 1, 10\}$.
+\label{theorem:carriers}
+\end{theorem}
+
+\begin{proof}
+    We look at bit position $q = 0$ which has by sure no carrier from a precursor bit addition. If we add the three bits $\left(b_{1,[0]}, b_{2,[0]}, b_{3,[0]}\right)$ we get for $b_{1,[0]} + b_{2,[0]} + b_{3,[0]} = 0$ the case $\left(0,0,0\right)$ with carrier $c_{[0]} = 0$ and the cases $\left(1,1,0\right)$, $\left(1,0,1\right)$ and $\left(0,1,1\right)$ with carrier $c_{[0]} = 1$ for a zero sum. Now, we go to bit position $q > 0$ which gets a carrier $c_{[q - 1]}$ from its direct precursor bit addition. In the case of $c_{[q-1]} = 0$ we have the same situation like before. In the case of $c_{[q-1]} = 1$ we get for $\left(c_{[q-1]}, b_{1,[q]}, b_{2,[q]}, b_{3,[q]}\right)$ the valid case $\left(1,1,1,1\right)$ with carrier $c_{[q]} = 10$ and the cases $\left(1,1,0,0\right)$, $\left(1,0,1,0\right)$ and $\left(1,0,0,1\right)$ with carrier $c_{[q]} = 1$.
+\label{proof:carriers}
+\end{proof}
+
+\begin{theorem}[Number of single bit addition bits]
+    Each bit addition during a zero sum binary addition of three integers consists of either $3$ or $4$ or $5$ bits in a single bit addition step $q$. 
+\label{theorem:numberofsinglebitadditionbits}
+\end{theorem}
+
+\begin{proof}
+    We get a $3$ bit bit addition in step $q$ if $\left(c_{[q-1]} = 0 \wedge c_{[q-2]} = 0\right)$. This is clearly always satisfied for bit position $q = 0$. It's also always fulfilled if $\left(c_{[q-1]} = 10 \wedge c_{[q-2]} = 1\right)$ or $\left(c_{[q-1]} = 10 \wedge c_{[q-2]} = 1 \wedge c_{[q-3]} = 10\right)$. We get a $4$ bit bit addition in step $q$ if $c_{[q-1]} = 1$ which can be generated by $c_{[q-2]} = 0$ or by $c_{[q-2]} = 1$. Finally, we get a $5$ bit bit addition in step $q$ if $c_{[q-1]} = 1$ and $c_{[q-2]} = 10$.
+\label{proof:numberofsinglebitadditionbits}
+\end{proof}
+
+
+\begin{theorem}[Number of $0$s and $1$s in integers for zero sum]
+    Each bit addition during a zero sum binary addition of three integers gets zero sum if for a $3$ bit addition the integers consist of three $0$s or of one $0$ and two $1$s at position $q$, if for a $4$ bit addition the integers consist of two $0$s and one $1$ or of three $1$s at position $q$ and if for a $5$ bit addition the integers consist of three $0$s or one $0$ and two $1$s at position $q$.
+\label{theorem:numberof0sand1sinintegersforzerosum}
+\end{theorem}
+
+
+\begin{proof}
+    To get a zero bit from a bit addition of $3$ bits its clear that this is statisfied if we receive $0$ with $c_{[q]} = 0$ which we get for the addition of three $0$s, or $10$ with $c_{[q]} = 1$ which we get for the addition of two $1$s. We get a zero bit from a bit addition of $4$ bits, one of them the carriere $c_{[q-1]} = 1$, if we receive $10$ with $c_{[q]} = 1$ which we receive for two $0$s and one $1$, or $100$ with $c_{[q]} = 10$ which we get for the additional addition of three $1$s. Finally, we get a zero bit from a bit addition of $5$ bits, two of them from the carriers $c_{[q-1]} = 1$ and $c_{[q-2]} = 10$, if we receive $10$ with $c_{[q]} = 1$ which we get for the addition of three additional $0$s, or $100$ with $c_{[q]} = 10$ which we get for the addition of additional one $0$ and two $1$.
+\label{proof:numberof0sand1sinintegersforzerosum}
+\end{proof}
+
+
+\begin{theorem}[Carriers for $3$, $4$ and $5$ bit bit additions]
+    The possible carriers of a $3$ bit bit addition at position $q$ are $c_{[q]} = 0$ or $c_{[q]} = 1$, for a $4$ bit bit addition $c_{[q]} = 1$ or $c_{[q]} = 10$, and for a $5$ bit bit addition $c_{[q]} = 1$ or $c_{[q]} = 10$.
+\label{theorem:carriersfor34and5bitbitadditions}
+\end{theorem}
+
+\begin{proof}
+    That proof directly follows from the proof above.
+\label{proof:carriersfor34and5bitbitadditions}
+\end{proof}
+
+With the results of theorem \ref{theorem:carriers} to \ref{theorem:carriersfor34and5bitbitadditions}, we can put together a set of rules regarding the properties of integers for zero sum addition of three numbers. We will write short $\mathcal{C}^{c_{[q]}}_{[q],b} := \left(\mathcal{C}_{[q],0}, \mathcal{C}_{[q],1}, c_{[q]}, b\right)$ with $C_{[q],0}$ be the number of $0$s, $C_{[q],1}$ be the number of $1$s, $c_{[q]}$ be the generated carriere and $b$ be the number of bits of the belonging case, for our possible bit cases.
+
+\begin{definition}[Zero sum bit addition properties]
+    
+    The zero sum bit addition of three numbers for position $q$ is statisfied for
+
+    \begin{equation}
+        \begin{aligned}
+                \mathcal{C}^{0}_{[q],3} &:= \left(3, 0, 0, 3\right) \quad & \mathcal{C}^{10}_{[q],4} &:= \left(0, 3, 10, 4\right) \quad & \mathcal{C}^{10}_{[q],5} &:= \left(1, 2, 10, 5\right)\\
+                \mathcal{C}^{1}_{[q],3} &:= \left(1, 2, 1, 3\right) \quad & \mathcal{C}^{1}_{[q],4} &:= \left(2, 1, 1, 4\right) \quad & \mathcal{C}^{1}_{[q],5} &:= \left(3, 0, 1, 5\right)
+            \label{eq:zerosumbitadditionproperties}
+        \end{aligned}
+    \end{equation}
+
+\label{def:zerosumbitadditionproperties}
+\end{definition}
+
+
+\begin{definition}[Zero sum bit addition rules]
+   
+    The complete zero sum addition of three numbers, each of length $N$, is given by the rules
+
+    \begin{align}
+        \begin{split}
+            \mathcal{C}^{0}_{[q],3} &\rightarrow \{\mathcal{C}^{0}_{[q+1],3}, \mathcal{C}^{1}_{[q+1],3}\}\\
+            \mathcal{C}^{1}_{[q],3} &\rightarrow \{\mathcal{C}^{10}_{[q+1],4}, \mathcal{C}^{1}_{[q+1],4}\}
+        \end{split}
+    \label{eq:intzerosumrulesb3}
+    \end{align}
+
+    \begin{align}
+        \begin{split}
+            \mathcal{C}^{10}_{[q],4} &\rightarrow \{\mathcal{C}^{0}_{[q+1],3} \rightarrow \{\mathcal{C}^{10}_{[q+2],4}, \mathcal{C}^{1}_{[q+2],4}\}, \mathcal{C}^{1}_{[q+1],3} \rightarrow \{\mathcal{C}^{10}_{[q+2],5}, \mathcal{C}^{1}_{[q+2],5}\}\}\\
+            \mathcal{C}^{1}_{[q],4} &\rightarrow \{\mathcal{C}^{10}_{[q+1],4}, \mathcal{C}^{1}_{[q+1],4}\}
+        \end{split}
+    \label{eq:intzerosumrulesb4}
+    \end{align}
+
+    \begin{align}
+         \begin{split}
+            \mathcal{C}^{10}_{[q],5} &\rightarrow \{\mathcal{C}^{0}_{[q+1],3} \rightarrow \{\mathcal{C}^{10}_{[q+2],4}, \mathcal{C}^{1}_{[q+2],4}\}, \mathcal{C}^{1}_{[q+1],3} \rightarrow \{\mathcal{C}^{10}_{[q+2],5}, \mathcal{C}^{1}_{[q+2],5}\}\}\\
+            \mathcal{C}^{1}_{[q],5} &\rightarrow \{\mathcal{C}^{10}_{[q+1],4}, \mathcal{C}^{1}_{[q+1],4}\}
+        \end{split}
+    \label{eq:inzerosumrulesb5}
+    \end{align}
+
+\label{def:zerosumbitadditionrules}
+\end{definition}
+
+
+\textbf{Notations.} We write $\mathcal{C}^{c_{[q]}}_{[q],b}\left(0\right)$ to get the value of $\mathcal{C}_{[q],0}$ from $\mathcal{C}^{c_{[q]}}_{[q],b}$, $\mathcal{C}^{c_{[q]}}_{[q],b}\left(1\right)$ to get the value of $\mathcal{C}_{[q],1}$ from $\mathcal{C}^{c_{[q]}}_{[q],b}$, $\mathcal{C}^{c_{[q]}}_{[q],b}\left(c\right)$ to get the value of $c_{[q]}$ from $\mathcal{C}^{c_{[q]}}_{[q],b}$ and $\mathcal{C}^{c_{[q]}}_{[q],b}\left(b\right)$ to get the value of $b$ from $\mathcal{C}^{c_{[q]}}_{[q],b}$.
+% --------------------------------------------------------------------------------
+\subsection{Rational Number Binary Addition}
+\label{ss:rationalnumberbinaryaddition}
+% --------------------------------------------------------------------------------
+After the analysis of the integer zero sum case, we now want to move to rational numbers, in general. Since, we want to introduce a binary representation based algorithm, we are interested in approaches for zero sum addition representation which use as less bits as possible to represent as much as possible different numbers. We want to discuss different options for this, in the following.
+% --------------------------------------------------------------------------------
+\subsubsection{Integer Reduction}
+\label{sss:integerreduction}
+% --------------------------------------------------------------------------------
+The most obvious possibility to analyse the zero sum of three rational numbers $q_{1} := \alpha_{1}/\beta_{1}$, $q_{2} := \alpha_{2}/\beta_{2}$ and $q_{3} := \alpha_{3}/\beta_{3}$, $\alpha_{i} \in \mathbb{Z}$ and $\beta_{i} \in \mathbb{N}_{1}$, is given by a reduction of rational numbers to integers. If we look at $0 \overset{!}{=} q_{1} + q_{2} + q_{3} = \alpha_{1}/\beta_{1} + \alpha_{2}/\beta_{2} + \alpha_{3}/\beta_{3} = \left(\alpha_{1}\beta_{2}\beta_{3} + \alpha_{2}\beta_{1}\beta_{3} + \alpha_{3}\beta_{1}\beta_{2}\right)/\left(\beta_{1}\beta_{2}\beta_{3}\right)$, we see that the zero sum question for rational numbers get reduced to the integer zero sum question $0 \overset{!}{=} \alpha_{1}\beta_{2}\beta_{3} + \alpha_{2}\beta_{1}\beta_{3} + \alpha_{3}\beta_{1}\beta_{2}$ which can be achived by multiplying all number by the product of denomiators of all $q$ respectively their lowest common denominator. The necessary number of bits of each new summand gets $b^3$, if the number of bits of all $\alpha_{i}$ and $\beta_{i}$ bit strings is $b$ each. Additionally, in each summand, we get a mix of nominators and denominators of several numbers. Later, we will see that this makes things unnecessary complicated, so we look at other options.
+% --------------------------------------------------------------------------------
+\subsubsection{Floating-Point Arithmetic Binary Addition}
+\label{sss:floatingpointarithmeticbinaryaddition}
+% --------------------------------------------------------------------------------
+We assume that given are three numbers $n_{1}$, $n_{2}$ and $n_{3}$ in floating-point arithmetic following the \textit{IEEE Standard for binary floating-point arithmetic} \cite{30711} \cite{4610935} \cite{8766229} which is used by the most computer systems, today. We want to analyse the zero sum binary addition of three numbers of this standard.
+
+\begin{definition}[Floating-point representation]
+
+    The floating-point representation of a real number is defined by 
+
+    \begin{equation}
+        n := s \cdot m \cdot b^{e}
+    \label{eq:floatingpointarithmeticdef}
+    \end{equation}
+
+    with the sign $s$, the mantissa $m$, the base $b$ and an exponent $e$.
+    The sign $s = \left(-1\right)^{S}$ is given by one bit $S$ ($S = 0$ positive, $S = 1$ negative). The mantissa $1 \leq m < 2$ consist of $p$ mantissa bits of value $M$ such that $m = 1.M = 1 + M/2^{p}$, because of normalization, so that the leading $1$ doesn't have to be saved. Following the IEEE standard for floating-point arithmetic \cite{8766229}, $b$ is always $2$. Finally the exponent $e$ is saved as not negative binary number $E$ by adding a fixed bias value $B$ with $E := e + B$. The bias value is determined by $2^{r-1} - 1$ for an exponent $e$ represented by $r$ bits.
+
+\label{def:floatingpointrepresentation}
+\end{definition}
+
+
+The maximal exponent value $E=11\dots 111_{2}=2^{r}-1$ is reserved as special value for $NaN$ and $\infty$, and the minimal exponent value $E=00\dots 000_{2}=0$ is reserved for the floating-point numbers $0$ and all denormalized values. $NaN$ is used for undefined values, like $0/0$ or $\infty - \infty$. Denormalized, or also called subnormal numbers, are number in the range of the smallest absolute normalized floating-point number and $0$. They are saved as fixed-point numbers and don't have the same precision like floating-point numbers.
+
+The IEEE standard \cite{8766229} differs between four possible datatypes: single ($32$ bits, $r = 8$ bits, $p = 23$ bits, $-126 \leq e \leq 127$, $B = 127$), single extended ($\geq 43$ bits, $r \geq 11$ bits, $p \geq 31$ bits, $e_{min} \leq -1022$ and $e_{max} \geq 1023$, $B$ is not specified), double ($64$ bits, $r = 11$ bits, $p = 52$ bits, $-1022 \leq e \leq 1023$, $B = 1023$) and double extended ($\geq 79$ bits, $r \geq 15$ bits, $p \geq 63$ bits, $e_{min} \leq -16382$ and $e_{max} \geq 16383$, $B$ is not specified) with precisions from $7$ to $20$ decimals. The specific representation of floating-point parameters isn't consistent from system to system. The most distributed representation consists of a big endian version with most left bit $b_{N-1}$ being defined as the sign bit, then the reserved exponent bits and finally the reserved mantissa bits as most right bit block. 
+
+
+\begin{comment}
+\begin{itemize}
+    \item \textbf{single}\\
+        Size: $32$ bits, $r = 8$ bits, $p = 23$ bits, $-126 \leq e \leq 127$, $B = 127$\\
+        Decimals: $7\dots 8$\\
+        Ranges: $\left(2^{-126} \approx 1.1 \cdot 10^{-38}, 2^{-32} 2^{-126} \approx 1.4 \cdot 10^{-45}, \left(2 - 2^{-23}\right)2^{127} \approx 3.4 \cdot 10^{38}\right)$
+    \item \textbf{single extended}\\
+        Size: $\geq 43$ bits, $r \geq 11$ bits, $p \geq 31$ bits, $e_{min} \leq -1022$ and $e_{max} \geq 1023$, $B$ is not specified\\
+        Decimals: $9\dots 10$\\
+        Ranges: $\left(2^{-1022} \approx 2.2 \cdot 10^{-308}, 2^{-31} 2^{-1022} \approx 1.0 \cdot 10^{-317}, \left(2 - 2^{-31}\right)2^{1023} \approx 1.8 \cdot 10^{308}\right)$        
+    \item \textbf{double}\\
+        Size: $64$ bits, $r = 11$ bits, $p = 52$ bits, $-1022 \leq e \leq 1023$, $B = 1023$\\
+        Decimals: $15\dots 16$\\
+        Ranges: $\left(2^{-1022} \approx 2.2 \cdot 10^{-308}, 2^{-52} 2^{-1022} \approx 4.9 \cdot 10^{-324}, \left(2 - 2^{-52}\right)2^{1023} \approx 1.8 \cdot 10^{308}\right)$
+    \item \textbf{double extended}\\
+        Size: $\geq 79$ bits, $r \geq 15$ bits, $p \geq 63$ bits, $e_{min} \leq -16382$ and $e_{max} \geq 16383$, $B$ is not specified\\
+        Decimals: $19\dots 20$\\
+        Ranges: $\left(2^{-16382} \approx 3.4 \cdot 10^{-4932}, 2^{-63} 2^{-16382} \approx 3.7 \cdot 10^{-4951}, \left(2 - 2^{-63}\right)2^{16383} \approx 1.2 \cdot 10^{4932}\right)$
+\label{it:datatypes}
+\end{itemize}
+
+Ranges $:=$ (Smallest absolute value (normalized), Smallest absolute value (denormalized), Maximal value)
+\end{comment}
+
+For analysing the zero sum addition of three given floating-point numbers in normalized representation, we have to determine the exponent $e$ of each number and bringing all three numbers to the same exponent, so we can do an analog addition like for integers. If we want to examine this addition bitwise like for integers, we are forced to temporary store each value with its full representation after a possible shifting by an exponent adjustment, to be able to align the radix point separation of all three numbers. For a floating-point datatype of size $b$ bits, mantissa $p$ bits and $r$ exponent bits, we get for $2^{1} 2^{r-1} 2^{p} = 2^{b}$ possible floating-point values with $b = r + p$ bits, a necessary mapped bit number $b^{\prime}$ of $1 + 2^{r-1} - 1 + p = 2^{r-1} + p$ bits for temporary storing. With this the maximal possible value which can be represented by the floating-point representation is given by $\left(2 - 2^{-p}\right)2^{2^{r-1} - 1}$. An other option is still to save only the original floating-point representation and working with additional information giving the number of additional zeros because of exponential shift and their positions by pointers or bit index savings during further parts of the algorithm, to return the correct bit value at a specific position, even without saving the shifted value itself.
+% --------------------------------------------------------------------------------
+\subsubsection{Fixed-Point Arithmetic Binary Addition}
+\label{sss:fixedpointarithmeticbinaryaddition}
+% --------------------------------------------------------------------------------
+Although, today mostly floating-point numbers are used, because of their large range of values, in some cases also fixed-point numbers are in usage, because of their higher precision and faster calculation without the leak of necessary exponential shifts for arithmetic calculations like additions.
+
+\begin{definition}[Fixed-point representation]
+
+    A binary fixed point number is defined by its total number of bits $b$, an optional sign bit $s$ and $b^{pre}$ digits before the radix point and $b^{post} = b - 1 - b^{pre}$ decimal places. The radix point position is fixed. The $b^{pre}$ digits are given as standard integer. The bits of the $b^{post}$ decimal places are given by the fractional parts of the given value to $b^{post}$.
+
+\label{def:fixedpointrepresentation}
+\end{definition}
+
+
+For example $0.25_{10}$ is presented exactly by $0.01_{2}$. Instead $0.7_{10}$ can only be approximated by $\approx 0.00001011_{2}$ in fixed-point arithmetic. Basic arithmetic operations like addition or subtraction can be done in the usual case like for integer numbers. Since, the radix point has a fixed position for all numbers, the necessary alignment can be trivially done. The total number of bits of a fixed-point number is $b = 1 + b^{pre} + b^{post}$ to present $2^{b}$ different numbers. The maximal possible value depends on the specific choice of $b^{pre}$ and $b^{post}$ and is given by $\left(2^{b^{pre}}-1\right).\left(2^{b^{post}} - 1\right)$. Like also already for floating-point numbers, instead of saving the new shifted value, we can also save shifting informations, to save memory space.
+% --------------------------------------------------------------------------------
+\subsubsection{Fixed-Point Integer Arithmetic Binary Addition}    
+\label{sss:fixedpointintegerarithmeticbinaryaddition}
+% --------------------------------------------------------------------------------
+We want to introduce a so-called \textit{fixed-point integer arithmetic} as variation of the standard fixed-point arithmetic.
+
+\begin{definition}[Fixed-point integer arithmetic]
+    A number $n$ in \textbf{fixed-point integer arithmetic} is given by a bit string $B^{b-1} := \left(i_{1},i_{2}\right)$, consisting of the two integers $i_{1}$ with $|i_{1}| := 1 + b^{pre}$ and $i_{2}$ with $|i_{2}| := 1 + b^{post}$ with the same sign $s_{1} = s_{2}$ and total length $b = 1 + b^{pre} + 1 + b^{post}$.
+\label{def:fixedpointintegerarithmetic}
+\end{definition}
+
+It is defined by its total number of bits $b$, optional sign bits $s_{1} = s_{2}$ and $b^{pre}$ digits before the radix point and $b^{post} = b - 1 - b^{pre} - 1$ decimal places, too. The radix point position is always fixed. Also like the fixed point arithmetic, the $b^{pre}$ digits are given as standard integer. In constrast to the fixed-point arithmetic the $b^{post}$ decimal places are also given by an integer, interpreting all decimal places as one integer, like if we would simple ignore the radix point and all digits before, and not by a fractional part. For example $2.25_{10}$ is presented by $10_{2}.11001_{2}$. In contrast to the fixed-point arithmetic, a correct representation of all decimal places within the precision of the number of bits $b^{post}$ is possible, but instead usual standard arithmetic operations like addition or substraction can no longer be done like before.
+
+\begin{example}
+    Consider the addition of the numbers $0.90_{10} = 0_{2}.1011010_{2}$ and $0.20_{10} = 0_{2}.0010100_{2}$ from which we subtract $0.10_{10} = 0_{2}.0001010_{2}$ by $-0.10_{10} = 0_{2}.1110110_{2}$ in fixed-point integer arithmetic (we left out the leading sign bits for the moment). We will look at the pre and the post radix point zero sum addition separately. For the post radix point addition we get $110 = 90_{10} + 20_{10} = 1011010_{2} + 0010100_{2} = 1101110_{2}$. It is obviously that substracting $-0.10_{10}$ will not give us $0_{10} = 0000000_{2}$, instead we will get $100_{10} = 1100100_{2}$. This means, if we are interested for the zero sum case, we have to look for $1100100_{2}$ and moving a leading $1$ carrier bit to our pre radix point addition, now.
+\label{example:fixedpointintegerarithmeticaddition}
+\end{example}
+
+With the help of this small example, we can steady properties of zero sum fixed-point integer arithemtic addition of three numbers.
+
+\begin{theorem}[Post radix point zero sum]
+    The fixed-point integer addition of three numbers $n_{1} := \alpha_{1}.\beta_{1}$, $n_{2} := \alpha_{2}.\beta_{2}$ and $n_{3} := \alpha_{3}.\beta_{3}$ gets a post radix point zero sum part if $\beta_{1} + \beta_{2} + \beta_{3} \in \{ -10^{b^{post}}_{10}, 0^{b^{post}}_{10}, 10^{b^{post}}_{10} \}$ for $b^{post} \geq 1$.
+\label{theorem:postradixpointzerosum}
+\end{theorem}
+
+\begin{proof}
+    For a sum of three numbers in fixed-point integer arithmetic, the maximum range of value for each positiv digit in base $10$ is $[0,9]$. Hence, the maximum positive value of the sum of three number lies within the range $[0, 3\cdot 10_{10}^{b^{post}}[$. For the case of zero sum, we know that we can either have three numbers each with $0$ as post radix point value, whose post radix point sum clearly gets $0$. Or we have two positive values plus one negative value, respectively one positive value and two negative values. The sum of two values of the same sign always lies in the range $[0, |2\cdot 10^{b^{post}}|[$. Hence, because we are looking for the zero sum case by the addition of the third value, we always get a zero sum case for a post radix point value of $0$ or $|10_{10}^{b^{post}}|$.
+\label{proof:postradixpointzerosum}
+\end{proof}
+
+\begin{theorem}[Post radix point addition carriers]
+    The possible carriers in base $10$ for a post radix point zero sum addition of three numbers are $\{-1, 0, 1\}$.
+\label{theorem:postradixpointadditioncarriers}
+\end{theorem}
+
+\begin{proof}
+    This follows trivially from theorem \ref{theorem:postradixpointzerosum}.
+\label{proof:postradixpointaddtioncarriers}
+\end{proof}
+
+With this new properties of zero sum addition, we see that we have a similiar case to the integer addition one. We also has the zero sum which leads to $0$s for each bit, but here we have the two additional cases of $-10^{b^{post}}_{10}$ and $10^{b^{post}}_{10}$, now. Hence, we have to think about this two additional situations in which we have to get $1$ at particular bit positions, now. We can use our results from integer addition helpfully.
+
+
+\begin{theorem}[Carriers $c_{[q]}$]
+    The zero sum post radix point binary addition $n_{1} + n_{2} + n_{3} = 0$ of three numbers in fixed-point integer representation has the possible carriers $c_{[q]} \in \{0,1,10\}$.
+\label{theorem:carriers_fixedpointinteger}
+\end{theorem}
+
+
+\begin{proof}
+    If we look at bit position $q = 0$, we have the carrier $c_{[q]} = 0$ for in the case of getting bit $0$ analog to the integer case. For getting a $1$ bit we have $\left(0,0,1\right), \left(0,1,0\right)$ and $\left(1,0,0\right)$. We get the carrier $c_{[q]} = 1$, if we want to get a $0$ bit, we have again the analog case like for integers and we get a $1$ bit for $\left(1,1,1\right)$. If we go to position $q = 1$, the $0$ bit case is again like for integers and if we want to get a $1$ bit with having a carrier $c_{[q-1]} = 1$, we need $\left(1,0,0,0\right)$ with carrier $c_{[q]} = 0$ or $\left(1,0,1,1\right), \left(1,1,0,1\right)$ or $\left(1,1,1,0\right)$ with carrier $c_{[q]} = 1$. Finally, at position $q = 2$, we can get again the analog case like for integers for $0$ bits, and if we want to get a $1$ bit with having a carrier $c_{[q-1]} = 1$ and $c_{[q-2]} = 10$, we need $\left(1,1,1,0,0\right), \left(1,1,0,1,0\right)$ or $\left(1,1,0,0,1\right)$ with carrier $c_{[q]} = 1$ or $\left(1,1,1,1,1\right)$ with carrier $c_{[q]} = 10$.
+\label{proof:carriers_fixedpointinteger}
+\end{proof}
+
+
+\begin{theorem}[Number of single bit addition bits]
+    Each bit addition during a zero sum post radix point binary addition of three numbers consists of either $3$ or $4$ or $5$ bits in a single bit addition step $q$.
+\label{theorem:numberofsinglebitadditionbits_fixedpointinteger}
+\end{theorem}
+
+\begin{proof}
+    Because of the same carrier situation like for the integer case, we have the analog proof for our statement like for theorem \ref{theorem:numberofsinglebitadditionbits}.
+\label{proof:numberofsinglebitadditionbits_fixedpointinteger}
+\end{proof}
+
+
+\begin{theorem}[Carriers for $3$, $4$ and $5$ bit bit additions]
+    The possible carriers of a $3$ bit bit addition at position $q$ are $c_{[q]} = 0$ or $c_{[q]} = 1$, for a $4$ bit bit addition $c_{[q]} = 1$ or $c_{[q]} = 10$, and for a $5$ bit bit addition $c_{[q]} = 1$ or $c_{[q]} = 10$.
+\label{theorem:carriersfor34and5bitbitadditions_fixedpointinteger}
+\end{theorem}
+
+\begin{proof}
+    That proof directly follows from the proofs above.
+\label{proof:carriersfor34and5bitbitadditions_fixedpointinteger}
+\end{proof}
+
+Form this, we can follow the properties for getting a $1$ bit during post radix point zero sum bit addition of three numbers.
+
+\begin{definition}[Post radix point zero sum bit addition properties for $1$ bits]
+    
+    The post radix point zero sum bit addition of three numbers for position $q$ for getting a $1$ bit is statisfied for
+
+    \begin{equation}
+        \begin{aligned}
+                \mathcal{C}^{0}_{[q],3} &:= \left(2, 1, 0, 3\right) \quad & \mathcal{C}^{1}_{[q],4} &:= \left(1, 2, 1, 4\right) \quad & \mathcal{C}^{1}_{[q],5} &:= \left(2, 1, 1, 5\right)\\
+                \mathcal{C}^{1}_{[q],3} &:= \left(0, 3, 1, 3\right) \quad & \mathcal{C}^{0}_{[q],4} &:= \left(3, 0, 0, 4\right) \quad & \mathcal{C}^{10}_{[q],5} &:= \left(0, 3, 10, 5\right)
+            \label{eq:zerosumbitadditionproperties_fixedpointinteger}
+        \end{aligned}
+    \end{equation}
+
+\label{def:zerosumbitadditionproperties_fixedpointinteger}
+\end{definition}
+
+The total number of bits of a fixed-point integer number is $b = 1 + b^{pre} + 1 + b^{post}$ to present $2^{b}$ different numbers. The maximal possible value depends on the specific choice of $b^{pre}$ and $b^{post}$ and is given by $\left(2^{b^{pre}}-1\right).\left(2^{b^{post}} - 1\right)$.
+% ================================================================================
