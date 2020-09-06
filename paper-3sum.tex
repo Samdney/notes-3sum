@@ -1,0 +1,125 @@
+% ================================================================================
+\documentclass{article}
+\pagestyle{plain}
+\usepackage{fullpage}
+% ================================================================================
+%\usepackage[left=1in,right=1in, top=1.2in,bottom=1.2in]{geometry}
+%\usepackage{times}
+\usepackage{amssymb,amsthm,latexsym,amsmath,epsfig,pgf}
+
+\usepackage{graphicx}
+\usepackage{comment}
+\usepackage{url}
+\usepackage{hyperref}
+
+\usepackage{blkarray}
+\usepackage{tikzsymbols}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\usepackage{blindtext}
+% ================================================================================
+\usepackage{listings}
+\lstset{
+    %basicstyle=\small\ttfamily,
+    frame=single,
+    language=C,
+    escapechar=|,
+    numbers=left,
+    stepnumber=1,
+    %numbersep=-10pt,
+    morekeywords={datatype, irrational, string, rule, list, list2D, new, node, node_T, node_Tstring, listnumber, fixedint, map, and, elseif, in, empty, pt}
+}
+% ================================================================================
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+\usepackage{algorithm}
+
+\algnewcommand\algorithmicinput{\textbf{Input:}}
+\algnewcommand\Input{\item[\algorithmicinput]}
+
+\algnewcommand\algorithmicoutput{\textbf{Output:}}
+\algnewcommand\Output{\item[\algorithmicoutput]}
+% ================================================================================
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem*{theorem A}{Theorem A}
+\newtheorem*{theorem B}{N\"olker's Theorem}
+\newtheorem{lemma}{Lemma}[section]
+\newtheorem{proposition}{Proposition}[section]
+\newtheorem{corollary}{Corollary}[section]
+\newtheorem{definition}{Definition}
+\newtheorem{problem}{Problem}
+\newtheorem{example}{Example}
+\newtheorem{step}{Step} \setcounter{step}{-1}
+\newtheorem*{question}{Question}
+\newtheorem {conjecture}{Conjecture}
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}[section]
+\theoremstyle{remark}
+\newtheorem{remarks}{Remarks}
+% ================================================================================
+\begin{document}
+% ================================================================================
+\title{A 3SUM algorithm on the binary addition level of atomic generated real numbers}
+% ================================================================================
+\author{Carolin Z\"obelein\thanks{The author believes in the importance of the independence of research and is funded by the public community. If you also believe in this values, you can find ways for supporting the author's work here: \url{https://research.carolin-zoebelein.de/funding.html}, Email: \href{mailto:contact@carolin-zoebelein.de}{\texttt{contact@carolin-zoebelein.de}}, PGP: D4A7 35E8 D47F 801F 2CF6 2BA7 927A FD3C DE47 E13B, \url{https://research.carolin-zoebelein.de} \LaTeX source availabe at \url{https://github.com/Samdney/paper-3sum}, \texttt{id: paper\_0003}, \Cooley}}
+% ================================================================================
+\date{\today}
+% ================================================================================
+\maketitle
+% ================================================================================
+\begin{center}
+    DRAFT
+\end{center}
+% ================================================================================
+\input{abstract}
+% ================================================================================
+\providecommand{\keywords}[1]{\small{\textbf{\textit{Keywords:}} #1}}
+\providecommand{\Classification}[1]{\small{\textbf{\textit{ACM Subject Classes:}} #1}}
+
+\begin{flushleft}
+    \keywords{3SUM Problem, Real Numbers, Irrational Numbers, Data Structures, Binary Representation, Data Storage Representation, Nonnumerical Algorithm, Complexity}\\
+    \Classification{E1, E2, F1.3, F2.2}
+\end{flushleft}
+% ================================================================================
+%\tableofcontents
+% ================================================================================
+\input{preamble}
+% ================================================================================
+\input{introduction}
+% ================================================================================
+\input{preliminaries}
+% ================================================================================
+\input{zerosum}
+% ================================================================================
+%\input{rammodel}        % TODO
+% ================================================================================
+\input{algorithm}
+% ================================================================================
+\input{complexities}
+% ================================================================================
+\input{conclusion}
+% ================================================================================
+\input{acknowledgement}
+% ================================================================================
+\input{license}
+% ================================================================================
+%\section*{References}
+% --------------------------------------------------------------------------------
+%\newpage
+%\clearpage
+%\markboth{Bibliography}{Bibliography}
+%\section*{Bibliography}
+%\label{s:bibliography}
+% --------------------------------------------------------------------------------
+%\bibliographystyle{amsplain}
+%\bibliographystyle{unsrtdin}
+%\bibliographystyle{plain}
+
+%\nocite{*}
+\bibliographystyle{amsplain}
+\bibliography{paper-3sum}
+% ================================================================================
+\end{document}
+% ================================================================================
