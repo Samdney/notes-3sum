@@ -1,0 +1,268 @@
+% ================================================================================
+\documentclass{article}
+\pagestyle{plain}
+\usepackage{fullpage}
+% ================================================================================
+%\usepackage[left=1in,right=1in, top=1.2in,bottom=1.2in]{geometry}
+%\usepackage{times}
+\usepackage{amssymb,amsthm,latexsym,amsmath,epsfig,pgf}
+
+\usepackage{graphicx}
+\usepackage{comment}
+\usepackage{url}
+\usepackage{hyperref}
+
+\usepackage{blkarray}
+\usepackage{tikzsymbols}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\usepackage{blindtext}
+% ================================================================================
+\usepackage{listings}
+\lstset{
+    %basicstyle=\small\ttfamily,
+    frame=single,
+    language=C,
+    escapechar=|,
+    numbers=left,
+    stepnumber=1,
+    %numbersep=-10pt,
+    morekeywords={datatype, irrational, string, rule, list, list2D, new, node, node_T, node_Tstring, listnumber, fixedint, map, and, elseif, in, empty, pt}
+}
+% ================================================================================
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+\usepackage{algorithm}
+
+\algnewcommand\algorithmicinput{\textbf{Input:}}
+\algnewcommand\Input{\item[\algorithmicinput]}
+
+\algnewcommand\algorithmicoutput{\textbf{Output:}}
+\algnewcommand\Output{\item[\algorithmicoutput]}
+% ================================================================================
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem*{theorem A}{Theorem A}
+\newtheorem*{theorem B}{N\"olker's Theorem}
+\newtheorem{lemma}{Lemma}[section]
+\newtheorem{proposition}{Proposition}[section]
+\newtheorem{corollary}{Corollary}[section]
+\newtheorem{definition}{Definition}
+\newtheorem{problem}{Problem}
+\newtheorem{example}{Example}
+\newtheorem{step}{Step} \setcounter{step}{-1}
+\newtheorem*{question}{Question}
+\newtheorem {conjecture}{Conjecture}
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}[section]
+\theoremstyle{remark}
+\newtheorem{remarks}{Remarks}
+% ================================================================================
+\begin{document}
+% ================================================================================
+\title{A 3SUM algorithm on the binary addition level of atomic generated real numbers}
+% ================================================================================
+\author{Carolin Z\"obelein\thanks{The author believes in the importance of the independence of research and is funded by the public community. If you also believe in this values, you can find ways for supporting the author's work here: \url{https://research.carolin-zoebelein.de/funding.html}, Email: \href{mailto:contact@carolin-zoebelein.de}{\texttt{contact@carolin-zoebelein.de}}, PGP: D4A7 35E8 D47F 801F 2CF6 2BA7 927A FD3C DE47 E13B, \url{https://research.carolin-zoebelein.de} \LaTeX source availabe at \url{https://github.com/Samdney/paper-3sum}, \texttt{id: paper\_0003}, \Cooley}}
+% ================================================================================
+\date{\today}
+% ================================================================================
+\maketitle
+% ================================================================================
+\begin{center}
+    DRAFT
+\end{center}
+% ================================================================================
+% ================================================================================
+\begin{abstract}
+    \blindtext[1]
+\end{abstract}
+% ================================================================================
+\providecommand{\keywords}[1]{\small{\textbf{\textit{Keywords:}} #1}}
+\providecommand{\Classification}[1]{\small{\textbf{\textit{ACM Subject Classes:}} #1}}
+
+\begin{flushleft}
+    \keywords{3SUM Problem, Real Numbers, Irrational Numbers, Data Structures, Binary Representation, Data Storage Representation, Nonnumerical Algorithm, Complexity}\\
+    \Classification{E1, E2, F1.3, F2.2}
+\end{flushleft}
+% ================================================================================
+\tableofcontents
+% ================================================================================
+The following content is a sketch for discussion purposes only, without warranty for mathematical completeness.
+% ================================================================================
+% --------------------------------------------------------------------------------
+\section{Introduction}
+\label{s:introduction}
+% --------------------------------------------------------------------------------
+In this notes we will give a sketchy discussion of an algorithm for solving the 3SUM problem.
+% ================================================================================
+% --------------------------------------------------------------------------------
+\section{Preliminaries}
+\label{s:preliminaries}
+% --------------------------------------------------------------------------------
+Some basic definitions and preparatory work.
+% --------------------------------------------------------------------------------
+\subsection{Problem Statement}
+\label{ss:problemstatement}
+% --------------------------------------------------------------------------------
+Let $L$ be a list of $n$ integers $n_{i}$, $i \in \mathbb{N}: i = 1,\dots, n$. All $n$ integers are given in a binary representation of $b$ bits each. Negative integers are given by their binary two's complement representation.
+
+\begin{definition}[3SUM Problem]
+    The 3SUM problem asks, if a given list $L$ of $n$ integers contains three elements $n_{i}$, $n_{j}$ and $n_{k}$, such that $n_{i} + n_{j} + n_{k} = 0$ for $i \neq j \neq k$.
+\label{def:3sumproblem}
+\end{definition}
+% --------------------------------------------------------------------------------
+\subsection{Binary addition}
+\label{ss:binaryaddition}
+% --------------------------------------------------------------------------------
+Our algorithm will work on the binary representation level of the given integers $n$. For this, we will have a short look at the different possible cases of bits for the addition of three numbers $n_{i}$, $n_{j}$ and $n_{k}$.\\
+
+\textbf{Notations.} We will index the bits $b_{i}$ of $n_{i}$ from right to left with $q = 0, \dots, b - 1$ and denote the $q$'th bit of $n_{i}$ by $b_{i}[q]$.
+% --------------------------------------------------------------------------------
+\subsubsection{Zero sum binary addition}
+\label{sss:zerosumbinaryaddition}
+% --------------------------------------------------------------------------------
+Since we are interested in the special case of zero sum of three numbers, we discuss this case, at first.\\
+
+We start with bit $q=0$. Here, we always have exactly three bits for our addition (the $0$'th bit of each of our numbers $n_{i}$, $n_{j}$ and $n_{k}$). Since, we are only interested in the zero sum case, we have to think for which combinations of three bits we can get $0$, at all. This are:
+
+\begin{enumerate}
+    \item $\mathcal{C}_{0,0} = 3, \mathcal{C}_{0,1} = 0, c_{0} = 0$: $\left(0,0,0\right)$
+    \item $\mathcal{C}_{0,0} = 1, \mathcal{C}_{0,1} = 2, c_{0} = 1$: $\left(1,1,0\right), \left(1,0,1\right), \left(0,1,1\right)$
+\label{enum:zerosum0thbit}
+\end{enumerate}
+
+$\mathcal{C}_{q,0}$ denotes the number of $0$'s and $\mathcal{C}_{q,1}$ the number of $1$'s in our three $q$ bits $b_{i}[q]$, $b_{j}[q]$ and $b_{k}[q]$. $c_{q}$ denotes the carrier of the given bit addition $b_{i}[q] + b_{j}[q] + b_{k}[q]$.\\
+
+If we have $c_{0} = 0$, then, for bit $q = 1$, we will have the same situation like for bit $q = 0$. Hence, let's look at the case of having a carrier $c_{0} = 1$ and what will happen then for bit $q = 1$. Because of the carriere $c_{0} = 1$, we have one bit more, hence four bits, now. We get zero sum for:
+
+\begin{enumerate}
+    \item $\mathcal{C}_{1,0} = 0, \mathcal{C}_{1,1} = 4, c_{1} = 10$: $\left(1,1,1,1\right)$
+    \item $\mathcal{C}_{1,0} = 2, \mathcal{C}_{1,1} = 2, c_{1} = 1$: $\left(1,1,0,0\right), \left(1,0,1,0\right), \left(1,0,0,1\right)$
+\label{enum:zerosum1thbit}
+\end{enumerate}
+
+In the first case with carrier $c_{1} = 10$, we will get for $q = 2$ the three bit case again, and for $q = 3$ the four bit case again. Depending if we choose $\left(0,0,0\right)$ or $\{ \left(1,1,0\right), \left(1,0,1\right), \left(0,1,1\right) \}$ for bit $q = 2$, we will finally get for bit $q = 3$ a four respectively five bit case (see also table \ref{tab:binaddthreemaxcarrier}). In the second case with carrier $c_{1} = 1$, we will get for $q = 2$ a four bit case again.
+
+\begin{table}[htp]
+\caption{Binary addition of three numbers with maximal carrier.}
+\label{tab:binaddthreemaxcarrier}
+\centering
+\vspace{0.3cm}
+    \begin{tabular}{ccccccccc}
+         &  & 1 &  & 1 &  &  & & \\
+        1 & 0 & 1 & 0 & 1 & 0 & 1 & & \\
+        \hline
+        $\cdots$ & $\cdots$ & 1 & 1 & 1 & 1 & 1 & 1 & \\
+        $\cdots$ & $\cdots$ & 1 & 1 & 1 & 1 & 1 & 1 & \\
+        $\cdots$ & $\cdots$ & 0 & 0 & 0 & 0 & 1 & 0 & \\
+        \hline
+        $\cdots$ & $\cdots$ & 0 & 0 & 0 & 0 & 0 & 0 & \\
+        $\cdots$ & $\cdots$ & \footnotesize{5} & \footnotesize{4} & \footnotesize{3} & \footnotesize{2} & \footnotesize{1} & \footnotesize{0} & \footnotesize{q}\\
+    \end{tabular}
+\end{table}
+
+So, let's assume we have a five bit case for bit $q = 3$ and get zero sum for:
+
+\begin{enumerate}
+    \item $\mathcal{C}_{3,0} = 1, \mathcal{C}_{3,1} = 4, c_{3} = 10$: $\left(1,1,0,1,1\right), \left(1,1,1,0,1\right), \left(1,1,1,1,0\right)$
+    \item $\mathcal{C}_{3,0} = 3, \mathcal{C}_{3,1} = 2, c_{3} = 1$: $\left(1,1,0,0,0\right)$
+\label{enum:zerosum3thbit}
+\end{enumerate}
+
+Here, we have a very similiar situation like for the case with four bits at $q = 1$. If we have carrier $c_{3} = 10$ for bit $q = 3$, we will have the three bit case for $q = 4$ and the four or five bit case for $q = 5$. If we have carriere $c_{3} = 1$, we will have the four bit case for bit $q = 4$.\\
+
+After this short discussion of possible cases, we will write this in a more formal way, next.
+% --------------------------------------------------------------------------------
+\subsubsection{Zero sum bit rules}
+\label{sss:zerosumbitrules}
+% --------------------------------------------------------------------------------
+For the binary addition of the three numbers $n_{i}, n_{j}$ and $n_{k}$ we can put the results for the zero sum case together to a complete set of rules. We will write short $\mathcal{C}^{c_{q}}_{q,b} := \left(\mathcal{C}_{q,0}, \mathcal{C}_{q,1}, c_{q}, b\right)$ with $b$ be the number of bits of the belonging case, for our possible bit cases. With this we can write:
+
+\begin{itemize}
+    \item Case: $b = 3$
+        \begin{align}
+            \begin{split}
+                \mathcal{C}^{0}_{q,3} &\rightarrow \{\mathcal{C}^{0}_{q+1,3}, \mathcal{C}^{1}_{q+1,3}\}\\
+                \mathcal{C}^{1}_{q,3} &\rightarrow \{\mathcal{C}^{10}_{q+1,4}, \mathcal{C}^{1}_{q+1,4}\}
+            \end{split}
+        \label{eq:b3}
+        \end{align}
+    \item Case: $b = 4$
+        \begin{align}
+            \begin{split}
+                \mathcal{C}^{10}_{q,4} &\rightarrow \{\mathcal{C}^{0}_{q+1,3} \rightarrow \{\mathcal{C}^{10}_{q+2,4}, \mathcal{C}^{1}_{q+2,4}\}, \mathcal{C}^{1}_{q+1,3} \rightarrow \{\mathcal{C}^{10}_{q+2,5}, \mathcal{C}^{1}_{q+2,5}\}\}\\
+                \mathcal{C}^{1}_{q,4} &\rightarrow \{\mathcal{C}^{10}_{q+1,4}, \mathcal{C}^{1}_{q+1,4}\}
+            \end{split}
+        \label{eq:b4}
+        \end{align}
+    \item Case: $b = 5$
+        \begin{align}
+             \begin{split}
+                \mathcal{C}^{10}_{q,5} &\rightarrow \{\mathcal{C}^{0}_{q+1,3} \rightarrow \{\mathcal{C}^{10}_{q+2,4}, \mathcal{C}^{1}_{q+2,4}\}, \mathcal{C}^{1}_{q+1,3} \rightarrow \{\mathcal{C}^{10}_{q+2,5}, \mathcal{C}^{1}_{q+2,5}\}\}\\
+                \mathcal{C}^{1}_{q,5} &\rightarrow \{\mathcal{C}^{10}_{q+1,4}, \mathcal{C}^{1}_{q+1,4}\}
+            \end{split}
+        \label{eq:b5}
+        \end{align}
+\label{it:casesrules}
+\end{itemize}
+
+\textbf{Notations.} We write $\mathcal{C}^{c_{q}}_{q,b}\left(0\right)$ to get the value of $\mathcal{C}_{q,0}$ from $\mathcal{C}^{c_{q}}_{q,b}$, $\mathcal{C}^{c_{q}}_{q,b}\left(1\right)$ to get the value of $\mathcal{C}_{q,1}$ from $\mathcal{C}^{c_{q}}_{q,b}$, $\mathcal{C}^{c_{q}}_{q,b}\left(c\right)$ to get the value of $c_{q}$ from $\mathcal{C}^{c_{q}}_{q,b}$ and $\mathcal{C}^{c_{q}}_{q,b}\left(b\right)$ to get the value of $b$ from $\mathcal{C}^{c_{q}}_{q,b}$.
+% ================================================================================
+% --------------------------------------------------------------------------------
+\section{The 3SUM Algorithm}
+\label{s:the3sumalgorithm}
+% --------------------------------------------------------------------------------
+Now we want to describe the final algorithm.
+% --------------------------------------------------------------------------------
+\subsection{Idea}
+\label{ss:idea}
+% --------------------------------------------------------------------------------
+We want to outline our 3SUM algorithm, at first.
+% --------------------------------------------------------------------------------
+\subsubsection{Basic concept}
+\label{sss:basicconcept}
+% --------------------------------------------------------------------------------
+Typical 3SUM algorithms like XXX \cite{A} and YYY \cite{B} works on the decimal base angel of view by going in different ways through the numbers $n$ of the given list $L$. In our algorithm, we move away from this approach. Instead, we will go through the binary representation of the given numbers. So, the final algorithm will be mainly dominated by the number of bits $b$ of integer representation which we have to examine and not by the number of elements $n$ of $L$.\\
+
+\textbf{What we do.} Since, we examine the 3SUM problem, we consider the binary addition of three integer numbers. We know from our previous discussion that only certain combinations of bits resulting in zero sums and that the possibilities for bits of position $q$ depend from the possibilities for bits of position $q-1$. We begin with the whole list $L$ and split it into two sublists. One which contains all numbers with $0$ at bit position $q=0$ and the other list which contains all numbers with $1$ at bit position $q=0$. We know, that for bit $q=0$ we have two possible rules which lead to a zero bit ($\mathcal{C}^{0}_{q,3}, \mathcal{C}^{1}_{q,3}$). We check for the first rule if the two sublists have enough elements (we also save the amount of numbers of each sublist) to statisfy this rule. If yes, then we safe this rule, if no, we throw it away. Then we do the same for the second rule. So, we have solved the 3SUM problem for bit $q = 0$.\\
+In the next step, we split again each of our sublists into two further sublists. At this time now, we do it for bit $q = 1$ instead of bit $q = 0$, of course. Then, we go through the list of our saved rules. We take the first saved rule and determine its two successor rules. We take the first succssor rule and check our new sublists if they have enough elements to statisfy this rule. If yes, we also have to check if the necessary amounts of numbers in this sublists are not in conflict with the amounts from our step before. If no, then safe this new rule, else through it away. In the same way, we do it for all possible rule successors.\\
+After repeating this steps for all bits $b$ of our bit representation, we get left with the set of all rules and their belonging numbers which solve the 3SUM problem.\\
+Hence, this algorithm depends on the number of bits of bit representation but not primary on the number of elements of $n$. Each time if we do a list split we can already count the number of elements of this list during spliting and no search, at no point in the algorithm, is necessary, if we implement it with two binary trees (one for the number lists and one for the rules) and pointers which always point to the last necessary elements of this trees.
+% --------------------------------------------------------------------------------
+\subsubsection{Algorithm}
+\label{sss:algorithm}
+% --------------------------------------------------------------------------------
+% --------------------------------------------------------------------------------
+\subsubsection{Pseudocode}
+\label{sss:pseudocode}
+% --------------------------------------------------------------------------------
+% --------------------------------------------------------------------------------
+\subsubsection{Complexity}
+\label{sss:complexity}
+% --------------------------------------------------------------------------------
+% ================================================================================
+Thanks to the private donators who financially support this work.
+% ================================================================================
+\begin{center}
+	\url{https://creativecommons.org/licenses/by-sa/4.0/}
+\end{center}
+% ================================================================================
+%\section*{References}
+% --------------------------------------------------------------------------------
+%\newpage
+%\clearpage
+%\markboth{Bibliography}{Bibliography}
+%\section*{Bibliography}
+%\label{s:bibliography}
+% --------------------------------------------------------------------------------
+%\bibliographystyle{amsplain}
+%\bibliographystyle{unsrtdin}
+%\bibliographystyle{plain}
+
+%\nocite{*}
+%\bibliographystyle{amsplain}
+%\bibliography{paper-3sum}
+% ================================================================================
+\end{document}
+% ================================================================================
