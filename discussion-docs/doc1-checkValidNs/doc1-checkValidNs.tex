@@ -1,0 +1,342 @@
+% ================================================================================
+\documentclass{article}
+\pagestyle{plain}
+\usepackage{fullpage}
+% ================================================================================
+%\usepackage[left=1in,right=1in, top=1.2in,bottom=1.2in]{geometry}
+%\usepackage{times}
+\usepackage{amssymb,amsthm,latexsym,amsmath,epsfig,pgf}
+
+\usepackage{graphicx}
+\usepackage{comment}
+\usepackage{url}
+\usepackage{hyperref}
+
+\usepackage{blkarray}
+\usepackage{tikzsymbols}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\usepackage{blindtext}
+% ================================================================================
+\usepackage{listings}
+\lstset{
+    %basicstyle=\small\ttfamily,
+    frame=single,
+    language=C,
+    escapechar=|,
+    numbers=left,
+    stepnumber=1,
+    %numbersep=-10pt,
+    morekeywords={datatype, irrational, string, rule, list, list2D, new, node, node_T, node_Tstring, listnumber, fixedint, map, and, elseif, in, empty, pt}
+}
+% ================================================================================
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+\usepackage{algorithm}
+
+\algnewcommand\algorithmicinput{\textbf{Input:}}
+\algnewcommand\Input{\item[\algorithmicinput]}
+
+\algnewcommand\algorithmicoutput{\textbf{Output:}}
+\algnewcommand\Output{\item[\algorithmicoutput]}
+% ================================================================================
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem*{theorem A}{Theorem A}
+\newtheorem*{theorem B}{N\"olker's Theorem}
+\newtheorem{lemma}{Lemma}[section]
+\newtheorem{proposition}{Proposition}[section]
+\newtheorem{corollary}{Corollary}[section]
+\newtheorem{definition}{Definition}
+\newtheorem{problem}{Problem}
+\newtheorem{example}{Example}
+\newtheorem{step}{Step} \setcounter{step}{-1}
+\newtheorem*{question}{Question}
+\newtheorem {conjecture}{Conjecture}
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}[section]
+\theoremstyle{remark}
+\newtheorem{remarks}{Remarks}
+% ================================================================================
+\begin{document}
+% ================================================================================
+\title{A 3SUM algorithm on the binary addition level of atomic generated real numbers\\
+-\\
+Discussion doc: checkValid ns values improvement}
+% ================================================================================
+\author{Carolin Z\"obelein\thanks{The author believes in the importance of the independence of research and is funded by the public community. If you also believe in this values, you can find ways for supporting the author's work here: \url{https://research.carolin-zoebelein.de/funding.html}, Email: \href{mailto:contact@carolin-zoebelein.de}{\texttt{contact@carolin-zoebelein.de}}, PGP: D4A7 35E8 D47F 801F 2CF6 2BA7 927A FD3C DE47 E13B, \url{https://research.carolin-zoebelein.de} \LaTeX source availabe at \url{https://github.com/Samdney/paper-3sum}, \texttt{id: paper\_0003}, \Cooley}}
+% ================================================================================
+\date{\today}
+% ================================================================================
+\maketitle
+% ================================================================================
+\begin{center}
+    DRAFT
+\end{center}
+% ================================================================================
+% ================================================================================
+\begin{abstract}
+    \blindtext[1]
+\end{abstract}
+% ================================================================================
+\providecommand{\keywords}[1]{\small{\textbf{\textit{Keywords:}} #1}}
+\providecommand{\Classification}[1]{\small{\textbf{\textit{ACM Subject Classes:}} #1}}
+
+\begin{flushleft}
+    \keywords{3SUM Problem, Real Numbers, Irrational Numbers, Data Structures, Binary Representation, Data Storage Representation, Nonnumerical Algorithm, Complexity}\\
+    \Classification{E1, E2, F1.3, F2.2}
+\end{flushleft}
+% ================================================================================
+\tableofcontents
+% ================================================================================
+% --------------------------------------------------------------------------------
+\section*{Preamble}
+\label{s:preamble}
+% --------------------------------------------------------------------------------
+The following content is a sketch for discussion purposes only, without warranty for mathematical completeness.
+% ================================================================================
+% --------------------------------------------------------------------------------
+\section{Introduction}
+\label{s:introduction}
+% --------------------------------------------------------------------------------
+The final complexity of the given algorithm leads to an $U^{1.58}$ part with $U := 2^{b}$. The power of $1.58$ results from the valid rule $\mathcal{C}$ with a given \texttt{ns} combination checks. In this discussion doc, we want to show, how this part of the algorithm can be improved.
+% ================================================================================
+% --------------------------------------------------------------------------------
+\section{Background}
+\label{s:background}
+% --------------------------------------------------------------------------------
+Considering the possible $\mathcal{C}$ rules at one specific $T^{string}$ node, we have the following possible successor $\mathcal{C}$ pairs at bit position $q$ for zero sum considerations:
+
+
+\begin{enumerate}
+    \item If we want to get a $0$ at bit position $q$:
+        \begin{enumerate}
+            \item $\mathcal{C}^{0}_{[q],3} := \left(3, 0, 0, 3\right)$ and $\mathcal{C}^{1}_{[q],3} := \left(1, 2, 1, 3\right)$
+            \item $\mathcal{C}^{10}_{[q],4} := \left(0, 3, 10, 4\right)$ and $\mathcal{C}^{1}_{[q],4} := \left(2, 1, 1, 4\right)$
+            \item $\mathcal{C}^{10}_{[q],5} := \left(1, 2, 10, 5\right)$ and $\mathcal{C}^{1}_{[q],5} := \left(3, 0, 1, 5\right)$
+        \end{enumerate}
+
+    \item If we want to get a $1$ at bit position $q$:
+        \begin{enumerate}
+            \item $\mathcal{C}^{0}_{[q],3} := \left(2, 1, 0, 3\right)$ and $\mathcal{C}^{1}_{[q],3} := \left(0, 3, 1, 3\right)$
+            \item $\mathcal{C}^{1}_{[q],4} := \left(1, 2, 1, 4\right)$ and $\mathcal{C}^{0}_{[q],4} := \left(3, 0, 0, 4\right)$
+            \item $\mathcal{C}^{1}_{[q],5} := \left(2, 1, 1, 5\right)$ and $\mathcal{C}^{10}_{[q],5} := \left(0, 3, 10, 5\right)$
+        \end{enumerate}
+\label{enum:background_Cpairs}
+\end{enumerate} 
+
+We can see that we get the two possible cases:
+
+\begin{equation}
+    \mathcal{C}^{\alpha}_{[q]} := \left(3,0\right) \quad \mathrm{and} \quad \mathcal{C}^{\beta}_{[q]} := \left(1,2\right)
+\label{eq:ruleCase_01}
+\end{equation}
+
+with worst case checks (see original paper):
+
+\begin{enumerate}
+    \item For $\mathcal{C}^{\alpha}_{[q]}\left(3,0\right)$:
+        \begin{enumerate}
+            \item $child_{1}.count \geq 1 \wedge child_{3}.count \geq 1 \wedge child_{5}.count \geq 1$
+        \end{enumerate}
+
+
+  \item Case $\mathcal{C}^{\beta}_{[q]}\left(1,2\right)$:
+        \begin{enumerate}
+            \item $child_{1}.count \geq 1 \wedge child_{4}.count \geq 1 \wedge child_{6}.count \geq 1$
+            \item $child_{2}.count \geq 1 \wedge child_{3}.count \geq 1 \wedge child_{6}.count \geq 1$
+            \item $child_{2}.count \geq 1 \wedge child_{4}.count \geq 1 \wedge child_{5}.count \geq 1$
+        \end{enumerate}
+\end{enumerate}
+
+and 
+
+\begin{equation}
+    \mathcal{C}^{\alpha}_{[q]} := \left(0,3\right) \quad \mathrm{and} \quad \mathcal{C}^{\beta}_{[q]} := \left(2,1\right)
+\label{eq:ruleCase_02}
+\end{equation}
+
+with worst case checks (see original paper):
+
+\begin{enumerate}
+    \item Case $\mathcal{C}^{\alpha}_{[q]}\left(0,3\right)$:
+        \begin{enumerate}
+            \item $child_{2}.count \geq 1 \wedge child_{4}.count \geq 1 \wedge child_{6}.count \geq 1$
+        \end{enumerate}
+
+    \item Case $\mathcal{C}^{\beta}_{[q]}\left(2,1\right)$:
+        \begin{enumerate}
+            \item $child_{1}.count \geq 1 \wedge child_{3}.count \geq 1 \wedge child_{6}.count \geq 1$
+            \item $child_{1}.count \geq 1 \wedge child_{4}.count \geq 1 \wedge child_{5}.count \geq 1$
+            \item $child_{2}.count \geq 1 \wedge child_{3}.count \geq 1 \wedge child_{5}.count \geq 1$.
+        \end{enumerate}
+\end{enumerate}
+% ================================================================================
+% --------------------------------------------------------------------------------
+\section{The improvements}
+\label{s:theimprovements}
+% --------------------------------------------------------------------------------
+Now, we explain how we can do some improvements regarding the valid combinations checking.
+% --------------------------------------------------------------------------------
+\subsection{Check count values in $T$}
+\label{ss:checkcountvaluesinT}
+% --------------------------------------------------------------------------------
+In our original paper, we wrote that we have to check each node in $T$ if their $count$ values are at least $1$, $2$ and $3$. We want to extend this checks to the following total set of checks for each node in $T$ instead.
+
+\begin{enumerate}
+    \item $node.count == 0$
+    \item $node.count \geq 1$
+    \item $node.count \geq 2$
+    \item $node.count \geq 3$
+    \item $node.count == node.parent.count$
+\label{enum:checks}
+\end{enumerate}
+
+With this, we set a flag in the following way for each node in $T$:
+
+\begin{enumerate}
+    \item If $node.count == 0$ is true:\\
+        Set flag $node.flag = 0$.
+    \item Else if $node.count \geq 1$ is true and $node.count != node.parent.count$ is true:\\
+        Set flag $node.flag = 1$.
+    \item Else if $node.count \geq 1$ is true and $node.count == node.parent.count$ is true:\\
+        Set flag $node.flag = p$, with $p$ be a fixed prime number.
+\label{enum:flags}
+\end{enumerate}
+
+To do this additional checks and to set the flags don't change the time complexity of $T$ generation with $\mathcal{O}\left(nb\right)$.
+% --------------------------------------------------------------------------------
+\subsection{Symmetry of child nodes}
+\label{ss:symmetryofchildnodes}
+% --------------------------------------------------------------------------------
+We can use the symmetry of characteristics of the two child nodes $child_{i} := node.zero$ and $child_{j} := node.one$ of a common direct parent node $node$.
+
+We know if the cardinal number of list elements of one child node equals the cardinal number of list elements of its parent, then the list of elements of the other child node has to be empty. With this we can derive the following flag maps between the two child nodes:
+
+\begin{equation}
+    \begin{split}
+        child_{i}.flag = p \quad &\mapsto \quad child_{j}.flag = 0\\
+        child_{i}.flag = 1 \quad &\mapsto \quad child_{j}.flag = 1\\
+        child_{i}.flag = 0 \quad &\mapsto \quad child_{j}.flag = p.
+    \label{eq:flagmaps}
+    \end{split}
+\end{equation}
+% --------------------------------------------------------------------------------
+\subsection{Single \texttt{ns} check improvement}
+\label{ss:singlenscheckimprovement}
+% --------------------------------------------------------------------------------
+Now, we look at our possible checks again. We start with the case $\mathcal{C}^{\alpha}_{[q]} := \left(3,0\right) \quad \mathrm{and} \quad \mathcal{C}^{\beta}_{[q]} := \left(1,2\right)$ and the flags for the necessary checks. We write them in short
+
+\begin{enumerate}
+    \item For $\mathcal{C}^{\alpha}_{[q]}\left(3,0\right)$:
+        \begin{enumerate}
+            \item $\left(f_{1}, f_{3}, f_{5}\right)$
+        \end{enumerate}
+
+
+  \item Case $\mathcal{C}^{\beta}_{[q]}\left(1,2\right)$:
+        \begin{enumerate}
+            \item $\left(f_{1}, f_{4}, f_{6}\right)$
+            \item $\left(f_{2}, f_{3}, f_{6}\right)$
+            \item $\left(f_{2}, f_{4}, f_{5}\right)$
+        \end{enumerate}
+\end{enumerate}
+
+We know that the belonging nodes of $f_{1}$ and $f_{2}$ have the same parent, the nodes of $f_{3}$ and $f_{4}$ have the same parent and the nodes of $f_{5}$ and $f_{6}$ have the same parent. 
+
+Assume we know $\left(f_{1}, f_{3}, f_{5}\right)$. We see that the three other flag triples differ from this one always by two flags which belong to the same parent like the ones of the first triples. For example we have $\left(f_{1}, f_{3} \mapsto f_{4}, f_{5} \mapsto f_{6}\right) = \left(f_{1}, f_{4}, f_{6}\right)$. This means, if we know $\left(f_{1}, f_{3}, f_{5}\right)$, together with the mapping \ref{eq:flagmaps}, we immediately also know the other three triples.
+
+Additionally, we can directly derive from a given triple $\left(f_{i}, f_{j}, f_{k}\right)$ with $f_{i}, f_{j}, f_{k} \in \{0, 1, p\}$ if the belonging check is true or false, we can derive an unique mapping for each given $\left(f_{1}, f_{3}, f_{5}\right)$ setting to a boolean 4-tuple $\left(c_{1}, c_{2}, c_{3}, c_{4}\right)$, $c \in \{ \mathrm{true}, \mathrm{false} \}$, telling us which of the four checkings is true and which ones are false.
+
+Since, we have three possible values for each $f$, we can define one matrix of size $3 \times 3 \times 3$. For a given configuration of $\left(f_{1}, f_{3}, f_{5}\right)$, we can directly derive the belonging $\left(c_{1}, c_{2}, c_{3}, c_{4}\right)$. To make it much more efficient we can, instead of saving just the boolean values $c$, directly write the saving instruction of \texttt{ns} as general function depending on the given node pointers, in our 4-tuple.
+
+Finally, we have
+
+\begin{equation}
+    \begin{split}
+        \left(f_{1}, f_{3}, f_{5}\right) \mapsto (&\\
+            & \mathrm{if \ c_{1} \ true:} \ T^{string}.C\_left.vn.add\left(ns\right),\\
+            & \mathrm{if \ c_{2} \ true:} \ T^{string}.C\_right.vn.add\left(ns\right),\\
+            & \mathrm{if \ c_{3} \ true:} \ T^{string}.C\_right.vn.add\left(ns\right),\\
+            & \mathrm{if \ c_{4} \ true:} \ T^{string}.C\_right.vn.add\left(ns\right)\\
+            )\\
+    \end{split}
+\label{eq:finalmatrixmapping}
+\end{equation}
+
+which is saved in a $3 \times 3 \times 3$ matrix.
+
+With the help of this processing and mapping we can easily parallelize checkings, by parting over the two given nodes. Since, in every matrix position the $\left(c_{1}, c_{2}, c_{3}, c_{4}\right)$ tuple is already clearly given, we can already prepocess instead of equation \ref{eq:finalmatrixmapping} like in the following way, by saving the left and write tuples as functions of \texttt{ns} pointer triples with 
+
+\begin{equation}
+    \begin{split}
+        \left(f_{1}, f_{3}, f_{5}\right) \mapsto &(\\
+            & T^{string}.C\_left.vn.add\left(\left(\mathrm{if \ c_{1} \ true:} \ ns\right)\right),\\
+            & T^{string}.C\_right.vn.add\left(\left(\mathrm{if \ c_{1} \ true:} \ ns, \mathrm{if \ c_{2} \ true:} \ ns, \mathrm{if \ c_{3} \ true:} \ ns\right)\right)
+            )\\
+    \end{split}
+\label{eq:finalmatrixmapping_v2}
+\end{equation}
+
+With this, we are now able to reduce the complexity. At first, we take the value of the flag triple $\left(f_{1}, f_{3}, f_{5}\right)$ to derive the matrix entry \ref{eq:finalmatrixmapping_v2}, which two entries (the one for $T^{string}.C\_left$ and the one for $T^{string}.C\_right$ can be run and saved in parallel.
+
+If we look at our second case with $\mathcal{C}^{\alpha}_{[q]} := \left(0,3\right) \quad \mathrm{and} \quad \mathcal{C}^{\beta}_{[q]} := \left(2,1\right)$, we see that we can do the same thing for this one.
+
+\begin{enumerate}
+    \item Case $\mathcal{C}^{\alpha}_{[q]}\left(0,3\right)$:
+        \begin{enumerate}
+            \item $\left(f_{2}, f_{4}, f_{6}\right)$
+        \end{enumerate}
+
+    \item Case $\mathcal{C}^{\beta}_{[q]}\left(2,1\right)$:
+        \begin{enumerate}
+            \item $\left(f_{1}, f_{3}, f_{6}\right)$
+            \item $\left(f_{1}, f_{4}, f_{5}\right)$
+            \item $\left(f_{2}, f_{3}, f_{5}\right)$
+        \end{enumerate}
+\end{enumerate}
+% --------------------------------------------------------------------------------
+\subsection{XXX}
+\label{ss:XXX}
+% --------------------------------------------------------------------------------
+TODO
+% ================================================================================
+% --------------------------------------------------------------------------------
+\section*{Conclusion}
+\label{s:conclusion}
+% --------------------------------------------------------------------------------
+TODO
+% ================================================================================
+% --------------------------------------------------------------------------------
+\section*{Acknowledgement}
+\label{s:acknowledgement}
+% --------------------------------------------------------------------------------
+Thanks to the private donators who financially support this work.
+% ================================================================================
+% --------------------------------------------------------------------------------
+\section*{License}
+\label{s:license}
+% --------------------------------------------------------------------------------
+\begin{center}
+	\url{https://creativecommons.org/licenses/by-sa/4.0/}
+\end{center}
+% ================================================================================
+%\section*{References}
+% --------------------------------------------------------------------------------
+%\newpage
+%\clearpage
+%\markboth{Bibliography}{Bibliography}
+%\section*{Bibliography}
+%\label{s:bibliography}
+% --------------------------------------------------------------------------------
+%\bibliographystyle{amsplain}
+%\bibliographystyle{unsrtdin}
+%\bibliographystyle{plain}
+
+%\nocite{*}
+%\bibliographystyle{amsplain}
+%\bibliography{paper-3sum}
+% ================================================================================
+\end{document}
+% ================================================================================
