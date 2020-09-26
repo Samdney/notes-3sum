@@ -51,7 +51,8 @@
 \newtheorem{definition}{Definition}
 \newtheorem{problem}{Problem}
 \newtheorem{example}{Example}
-\newtheorem{step}{Step} \setcounter{step}{-1}
+%\newtheorem{step}{Step} \setcounter{step}{-1}
+\newtheorem{step}{Step}
 \newtheorem*{question}{Question}
 \newtheorem {conjecture}{Conjecture}
 \theoremstyle{remark}
@@ -77,7 +78,8 @@ Discussion doc: checkValid ns values improvement}
 % ================================================================================
 % ================================================================================
 \begin{abstract}
-    \blindtext[1]
+    %\blindtext[1]
+    In this notes we want to discuss some possible improvements for \texttt{ns} value checking in our original paper.
 \end{abstract}
 % ================================================================================
 \providecommand{\keywords}[1]{\small{\textbf{\textit{Keywords:}} #1}}
@@ -297,16 +299,107 @@ If we look at our second case with $\mathcal{C}^{\alpha}_{[q]} := \left(0,3\righ
         \end{enumerate}
 \end{enumerate}
 % --------------------------------------------------------------------------------
-\subsection{XXX}
-\label{ss:XXX}
+\subsection{General \texttt{ns} check improvement}
+\label{ss:generalnscheckimprovement}
 % --------------------------------------------------------------------------------
-TODO
+We want to discuss some possible data structure aspects for an improvement of all \texttt{ns} values at once checking.
+
+We know that in deph $b$ we can have $2^{1.58 \cdot b}$ \texttt{ns} values at each $T^{string}$ node. For each of them we have to make in the the worst case one check for the left $\mathcal{C}$ rule and three checks for the right $\mathcal{C}$ value, hence totally worst case situation are $3 \cdot 2^{1.58 \cdot b}$ checks which have to be done sequentially in each deph of the binary tree $T^{string}$, regarding time complexity.
+
+Now, we want to propose the following approach considering the checks for depth $b$:
+
+\begin{step}[Preprocessing for checks]
+
+    Consider a preprocssing with the following assumptions:
+
+    \begin{itemize}
+        \item We assume that all necessary memory is already allocated with a negotiated fixed addressing scheme so that particular places in memory can directly be accessed respectively it can directly written at the specific position (for example like an array with allocated memory and empty entries). In further steps we will denote it simply as datastructure and talk about it like an array (although it not has to be mandatory an array!)
+
+        \item We assume this allocated space is organized in two data structures. The data structure $DS_{T}$ which saves the results of checks and flag in tree $T$ and a data structure $DS_{T^{string}}$ which saves pointers to addresses of the needed node checks and flags, a function calling which calls the saving instructions, the savings itself of the solutions, and a final instruction for each valid solution for the determination of the next $\mathcal{C}$ with \texttt{ns} constellations and addressings, which are needed.
+
+    \end{itemize}
+
+\label{step:preprocessingforchecks}
+\end{step}
+
+Next, we go to tree $T$ at depth $b$.
+
+\begin{step}
+
+    We have two interacting (= connected) datastructures.
+
+    \begin{enumerate}
+
+        \item We check at each node of $T$ in depth $b$, 
+
+            \begin{enumerate}
+                \item $node.count == 0$
+                \item $node.count \geq 1$
+                \item $node.count \geq 2$
+                \item $node.count \geq 3$
+                \item $node.count == node.parent.count$
+            \label{enum:checks}
+            \end{enumerate}
+
+            and determine the flag
+
+            \begin{enumerate}
+                \item If $node.count == 0$ is true:\\
+                    Set flag $node.flag = 0$.
+                \item Else if $node.count \geq 1$ is true and $node.count != node.parent.count$ is true:\\
+                    Set flag $node.flag = 1$.
+                \item Else if $node.count \geq 1$ is true and $node.count == node.parent.count$ is true:\\
+                    Set flag $node.flag = p$, with $p$ be a fixed prime number.
+            \label{enum:flags}
+            \end{enumerate}
+
+            We save this results each immediately after determination as an \texttt{true} or \texttt{false} entry in our tree $T$ datastructure $DS_{T}$. For example, we can use here an array with one row for each kind of check and the flag and with one column for each node. So, we have an array with size $6 \times 2^{b}$.
+
+        \item We already discussed in the last section, that we just need three specific flags (we chose $\left(f_{1}, f_{3}, f_{5}\right)$) to be able to directly derive which of the four checks are true and which are false (the belonging $\left(c_{1}, c_{2}, c_{3}, c_{4}\right)$ constellation). So we can define a general function depending on the input $\left(f_{1}, f_{3}, f_{5}\right)$ and \texttt{ns}, just consisting of saving instructions. Depending on the specific value combination of the flags $\left(f_{1}, f_{3}, f_{5}\right)$ it chooses if we have to save e.g. only the first check, or only the second check, or both checks, etc....  (Similiar to equation (\ref{eq:finalmatrixmapping} respectively \ref{eq:finalmatrixmapping_v2}), but NOT as list saving like it is done there with the \texttt{.add(...)} part. We will still come back to this, later).
+
+        So, we assume that we have a datastructure $DS_{T^{string}}$ in which we have saved for each \texttt{ns} of each node of $T^{string}$ in depth $b$ an addressing (e.g. pointers) to the necessary flags in $DS_{T}$ which we need to know, to know which checks for \texttt{ns} become true and which become false. This means for one node of $T^{string}$ we have e.g. an array of size $1 \times 2^{1.58 \cdot b}$ addressings of needed flags.
+    \end{enumerate}
+
+    Now, if we already determined all checks in $T$, after determining the flag $f$ of each node, then in $DT_{T^{string}}$ the addressing pointers get the necessary information (which is $\mathcal{O}\left(1\right)$ for all \texttt{ns} of the tree in depth $b$ since this runs in parallel). If we also add a call instruction to each $DS_{T^{string}}$ entry, then we can immediately call our just discussed saving function, also in parallel for all \texttt{ns} as just one saving command with $\mathcal{O}\left(1\right)$ (since we use already allocated memory instead of lists for saving the \texttt{ns} values anymore), too.
+
+\label{step:treeT_checks}
+\end{step}
+
+So, we see that we already checked and saved solutions for depth $b$ in constant time. What we not discussed is the preprocessing part from the beginning. We look at this with the following, now.
+
+\begin{enumerate}
+    \item Since, we use fixed sized memory structures, the allocation of the whole necessary memory space for all possible entries can be done in just one step totally (so we have time complexity for all allocation of $\mathcal{O}\left(1\right)$).
+
+    \item We have one general function (or better class method) $F\left(\left(f_{1}, f_{3}, f_{5}\right), ns\right)$, which consists of the general, functional, saving instructions. Depending which $\left(f_{1}, f_{3}, f_{5}\right)$ is given, it choose the right ones and saves it at the binary tree places of its belonging instance. 
+
+    \item For this whole considerations, we need to know already in the preprocessing step the next $\mathcal{C}$ rules of the next step. We can do this if we already add in step \ref{step:treeT_checks} an additionally call after saving our solutions, which immediately determines the next rules and their belonging necessary \texttt{ns} constellation and node addressings, which can we do if memory space of data structure $DS_{T}$ at this moment also already exists and is allocated, to know the necessary addresssing information. This can be done without problems, since $DS_{T}$ only already have to be allocated but not already the entries determined and total allocation runs in time complexity $\mathcal{O}\left(1\right)$.
+
+    \item Since we use already allocated space with fixed addressing, we do the saving instructions in parallel. Alternatively, we could also define tuple savings like in equation (\ref{eq:finalmatrixmapping_v2}) which also breaks the needed time complexity down to totally constant time complexity for saving all valid solutions of $\mathcal{O}\left(3\right)$ in depth $b$.
+
+\label{enum:prepocessingdiscus}
+\end{enumerate}
+
+So, we can summarise a final step.
+
+\begin{step}
+    After saving all solutions in step \ref{step:treeT_checks} in parallel (the solutions itself are also saved in the data structure $DS_{T^{string}}$), we call an additional function, also in parallel, for each valid solution, directly after we saved this solution to determine the next $\mathcal{C}$ with \texttt{ns} constellations, derive the necessary addressings for our pointers in $DS_{T^{string}}$ already for the next step and save them in $DS_{T^{string}}$.
+
+    In the meantime, the total allocation of the next step memory space of $DS_{T}$ already happened with time complexity $\mathcal{O}\left(1\right)$.
+
+\label{step:preallocationnext}
+\end{step}
+
+With this steps we get a checking of all possibile checks for all valid \texttt{ns} solution in constant time in each depth step $b$. Hence, we get, instead of $U^{1.58 \cdot b}$ with $U := 2^{b}$ before, a time complexity of constant time $b+1$.
+
+All this way of improvement only works, if we assume that all allocation, function calls and saving can be done in constant time and that the additional parallelization part, compared with the approach before, not considerably raise the computation time.
 % ================================================================================
 % --------------------------------------------------------------------------------
 \section*{Conclusion}
 \label{s:conclusion}
 % --------------------------------------------------------------------------------
-TODO
+We see that we are able to improve the complexitiy under the assumption of specific constraint conditions.
+
+One additional improvement (not presented here) consists in the possibility of a combination of both approaches (the original one in the paper, and the one here). We can split the whole set of solution checkings in such a way, that we get a worst case number of checks sequentially of $2 \cdot 2^{b}$ by putting the rest of checks in parallel like here presented, which can be done, if we use fixed allocated memory space like here presented, too.
 % ================================================================================
 % --------------------------------------------------------------------------------
 \section*{Acknowledgement}
