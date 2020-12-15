@@ -66,7 +66,7 @@
 -\\
 Discussion doc: checkValid ns values improvement}
 % ================================================================================
-\author{Carolin Z\"obelein\thanks{The author believes in the importance of the independence of research and is funded by the public community. If you also believe in this values, you can find ways for supporting the author's work here: \url{https://research.carolin-zoebelein.de/funding.html}, Email: \href{mailto:contact@carolin-zoebelein.de}{\texttt{contact@carolin-zoebelein.de}}, PGP: D4A7 35E8 D47F 801F 2CF6 2BA7 927A FD3C DE47 E13B, \url{https://research.carolin-zoebelein.de} \LaTeX source availabe at \url{https://github.com/Samdney/paper-3sum}, \texttt{id: paper\_0003}, \Cooley}}
+\author{Carolin Z\"obelein\thanks{The author believes in the importance of the independence of research and is funded by the public community. If you also believe in this values, you can find ways for supporting the author's work here: \url{https://research.carolin-zoebelein.de/funding.html}, Email: \href{mailto:contact@carolin-zoebelein.de}{\texttt{contact@carolin-zoebelein.de}}, PGP: D4A7 35E8 D47F 801F 2CF6 2BA7 927A FD3C DE47 E13B, \url{https://research.carolin-zoebelein.de} \LaTeX source availabe at \url{https://github.com/Samdney/notes-3sum}, \texttt{id: notes\_0003}, \Cooley}}
 % ================================================================================
 \date{\today}
 % ================================================================================
@@ -79,7 +79,7 @@ Discussion doc: checkValid ns values improvement}
 % ================================================================================
 \begin{abstract}
     %\blindtext[1]
-    In this notes we want to discuss some possible improvements for \texttt{ns} value checking in our original paper.
+    In this notes we want to discuss some possible improvements for \texttt{ns} value checking in our original notes.
 \end{abstract}
 % ================================================================================
 \providecommand{\keywords}[1]{\small{\textbf{\textit{Keywords:}} #1}}
@@ -135,7 +135,7 @@ We can see that we get the two possible cases:
 \label{eq:ruleCase_01}
 \end{equation}
 
-with worst case checks (see original paper):
+with worst case checks (see original notes):
 
 \begin{enumerate}
     \item For $\mathcal{C}^{\alpha}_{[q]}\left(3,0\right)$:
@@ -159,7 +159,7 @@ and
 \label{eq:ruleCase_02}
 \end{equation}
 
-with worst case checks (see original paper):
+with worst case checks (see original notes):
 
 \begin{enumerate}
     \item Case $\mathcal{C}^{\alpha}_{[q]}\left(0,3\right)$:
@@ -184,7 +184,7 @@ Now, we explain how we can do some improvements regarding the valid combinations
 \subsection{Check count values in $T$}
 \label{ss:checkcountvaluesinT}
 % --------------------------------------------------------------------------------
-In our original paper, we wrote that we have to check each node in $T$ if their $count$ values are at least $1$, $2$ and $3$. We want to extend this checks to the following total set of checks for each node in $T$ instead.
+In our original notes, we wrote that we have to check each node in $T$ if their $count$ values are at least $1$, $2$ and $3$. We want to extend this checks to the following total set of checks for each node in $T$ instead.
 
 \begin{enumerate}
     \item $node.count == 0$
@@ -399,7 +399,7 @@ All this way of improvement only works, if we assume that all allocation, functi
 % --------------------------------------------------------------------------------
 We see that we are able to improve the complexitiy under the assumption of specific constraint conditions.
 
-One additional improvement (not presented here) consists in the possibility of a combination of both approaches (the original one in the paper, and the one here). We can split the whole set of solution checkings in such a way, that we get a worst case number of checks sequentially of $2 \cdot 2^{b}$ by putting the rest of checks in parallel like here presented, which can be done, if we use fixed allocated memory space like here presented, too.
+One additional improvement (not presented here) consists in the possibility of a combination of both approaches (the original one in the notes, and the one here). We can split the whole set of solution checkings in such a way, that we get a worst case number of checks sequentially of $2 \cdot 2^{b}$ by putting the rest of checks in parallel like here presented, which can be done, if we use fixed allocated memory space like here presented, too.
 % ================================================================================
 % --------------------------------------------------------------------------------
 \section*{Acknowledgement}
@@ -429,7 +429,7 @@ Thanks to the private donators who financially support this work.
 
 %\nocite{*}
 %\bibliographystyle{amsplain}
-%\bibliography{paper-3sum}
+%\bibliography{notes-3sum}
 % ================================================================================
 \end{document}
 % ================================================================================
