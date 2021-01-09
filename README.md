@@ -8,5 +8,10 @@ Notes, id: notes_000X
 ## Discussions
 In the sub directory 'discussion-docs' you can find discussion documents regarding specific points in the notes.
 
+## Releases
+pdf files of all releases available in directory *releasePdfs*.
+
+* v1-20200906: Document Version from 2020/09/06
+
 ## License
 See License file.
