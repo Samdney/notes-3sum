@@ -10,10 +10,10 @@ In this notes, we want to introduce a binary representation based algorithm. Mos
 % --------------------------------------------------------------------------------
 Considering a set of given real numbers $n \in \mathbb{R}$, we have to differ between several kinds of numbers, which are integers $z \in \mathbb{Z}$, rational $q \in \mathbb{Q}$ and irrational $i \in \mathbb{R} \setminus \mathbb{Q}$ numbers. Since integers are a subset of rational numbers which can be written by $z/1$, we only have to differ in practice between rational and irrational numbers, regarding the problem of finite precision of representation of a number on a computer system and the question how we can decide if the sum of three numbers of possible irrational cases is zero or not. 
 
-At first, we need to take a short look at the character of irrational numbers, in generally. Irrational numbers are numbers which can not be presented by a fraction $\frac{z_{1}}{z_{2}}$, $z_{1}, z_{2} \in \mathbb{Z}$. The most known irrational numbers are $\pi$, $e$ but also $\sqrt{2}$. Although this numbers play an important role, there are still some unsolved questions regarding them. At first it is not know if for all cases of $i_{1}i_{2}$ with $i_{1}, i_{1} \in \mathbb{R} \setminus \mathbb{Q}$, the product is still also an irrational number. Until now, there couldn't be found a counterexample but also no general proof that all cases are leading to irrational numbers \cite{Irration5:online}. As second, it is also not known if the linear combination of two irrational numbers by $q_{1} i_{1} + q_{2} i_{2}$ with $q_{1}, q_{2} \in \mathbb{Q}$ is always an irrational number \cite{Irration5:online} \cite{PifromWo5:online}, too. Finally, it exists just an assumption but no proof for the irrational nature of the numbers $2^{e}$, $\pi^{e}$, $\pi^{\sqrt{2}}$, $\pi^{\pi}$, $e^{e}$ and $\gamma$ (the Euler–Mascheroni constant) \cite{Irration5:online}. Because of this unsolved questions, we want to introdude irrational numbers regarding the \texttt{3SUM} problem in a specific way. For this, we introduce \texttt{Atomic irrational numbers}.
+At first, we need to take a short look at the character of irrational numbers, in generally. Irrational numbers are numbers which can not be presented by a fraction $\frac{z_{1}}{z_{2}}$, $z_{1}, z_{2} \in \mathbb{Z}$. The most known irrational numbers are $\pi$, $e$ but also $\sqrt{2}$. Although this numbers play an important role, there are still some unsolved questions regarding them. At first it is not know if for all cases of $i_{1}i_{2}$ with $i_{1}, i_{1} \in \mathbb{R} \setminus \mathbb{Q}$, the product is still also an irrational number. Until now, there couldn't be found a counterexample but also no general proof that all cases are leading to irrational numbers \cite{Irration5:online}. As second, it is also not known if the linear combination of two irrational numbers by $q_{1} i_{1} + q_{2} i_{2}$ with $q_{1}, q_{2} \in \mathbb{Q}$ is always an irrational number \cite{Irration5:online} \cite{PifromWo5:online}, too. Finally, it exists just an assumption but no proof for the irrational nature of the numbers $2^{e}$, $\pi^{e}$, $\pi^{\sqrt{2}}$, $\pi^{\pi}$, $e^{e}$ and $\gamma$ (the Euler–Mascheroni constant) \cite{Irration5:online}. Because of this unsolved questions, we want to describe irrational numbers regarding the \texttt{3SUM} problem in a specific way. For this, we introduce \texttt{Atomic irrational numbers}.
 
 \begin{definition}[Atomic irrational numbers]
-    Given a finite set $\mathbb{I}_{a}$ of irrational numbers $i_{a} \in \mathbb{R} \setminus \mathbb{Q}$. We call this numbers \textbf{Atomic irrational numbers} if they statisfy all of the following properties:
+    Given a finite set $\mathbb{I}_{a}$ of irrational numbers $i_{a} \in \mathbb{R} \setminus \mathbb{Q}$. We call this numbers \textbf{Atomic irrational numbers} if they satisfy all of the following properties:
 
     \begin{enumerate}
         \item For all $i_{a,1}, i_{a,2} \in \mathbb{I}_{a}$, we have $i_{a,2} \neq q i_{a,2}$, $\forall q \in \mathbb{Q}$.
@@ -89,7 +89,7 @@ We assume that given are three integers $z_{1}$, $z_{2}$ and $z_{3}$ and their b
 
 
 \begin{proof}
-    To get a zero bit from a bit addition of $3$ bits its clear that this is statisfied if we receive $0$ with $c_{[q]} = 0$ which we get for the addition of three $0$s, or $10$ with $c_{[q]} = 1$ which we get for the addition of two $1$s. We get a zero bit from a bit addition of $4$ bits, one of them the carriere $c_{[q-1]} = 1$, if we receive $10$ with $c_{[q]} = 1$ which we receive for two $0$s and one $1$, or $100$ with $c_{[q]} = 10$ which we get for the additional addition of three $1$s. Finally, we get a zero bit from a bit addition of $5$ bits, two of them from the carriers $c_{[q-1]} = 1$ and $c_{[q-2]} = 10$, if we receive $10$ with $c_{[q]} = 1$ which we get for the addition of three additional $0$s, or $100$ with $c_{[q]} = 10$ which we get for the addition of additional one $0$ and two $1$.
+    To get a zero bit from a bit addition of $3$ bits its clear that this is satisfied if we receive $0$ with $c_{[q]} = 0$ which we get for the addition of three $0$s, or $10$ with $c_{[q]} = 1$ which we get for the addition of two $1$s. We get a zero bit from a bit addition of $4$ bits, one of them the carriere $c_{[q-1]} = 1$, if we receive $10$ with $c_{[q]} = 1$ which we receive for two $0$s and one $1$, or $100$ with $c_{[q]} = 10$ which we get for the additional addition of three $1$s. Finally, we get a zero bit from a bit addition of $5$ bits, two of them from the carriers $c_{[q-1]} = 1$ and $c_{[q-2]} = 10$, if we receive $10$ with $c_{[q]} = 1$ which we get for the addition of three additional $0$s, or $100$ with $c_{[q]} = 10$ which we get for the addition of additional one $0$ and two $1$.
 \label{proof:numberof0sand1sinintegersforzerosum}
 \end{proof}
 
@@ -108,7 +108,7 @@ With the results of theorem \ref{theorem:carriers} to \ref{theorem:carriersfor34
 
 \begin{definition}[Zero sum bit addition properties]
     
-    The zero sum bit addition of three numbers for position $q$ is statisfied for
+    The zero sum bit addition of three numbers for position $q$ is satisfied for
 
     \begin{equation}
         \begin{aligned}
@@ -308,11 +308,11 @@ With this new properties of zero sum addition, we see that we have a similiar ca
 \label{proof:carriersfor34and5bitbitadditions_fixedpointinteger}
 \end{proof}
 
-Form this, we can follow the properties for getting a $1$ bit during post radix point zero sum bit addition of three numbers.
+From this, we can follow the properties for getting a $1$ bit during post radix point zero sum bit addition of three numbers.
 
 \begin{definition}[Post radix point zero sum bit addition properties for $1$ bits]
     
-    The post radix point zero sum bit addition of three numbers for position $q$ for getting a $1$ bit is statisfied for
+    The post radix point zero sum bit addition of three numbers for position $q$ for getting a $1$ bit is satisfied for
 
     \begin{equation}
         \begin{aligned}
